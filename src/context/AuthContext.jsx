@@ -1,4 +1,6 @@
 import {createContext, useContext, useState} from 'react'
+import { ROLES } from '../constants/roles';
+
 
 const AuthContext = createContext(null)
 
@@ -14,7 +16,7 @@ export function AuthProvider({children})
             user: {
                 id: 1,
                 nombre: "Pepito Perez",
-                rol: "OperadorLogistico"
+                rol: ROLES.OPERADOR_LOGISTICO
             }
         }
 
