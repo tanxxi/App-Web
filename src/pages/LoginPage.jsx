@@ -29,7 +29,7 @@ function LoginPage() {
 
   return (
     <div>
-      <h1>Seguimiento de Pedidos</h1>
+      <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         {error && (
           <div style={{ background: '#fff0f0', padding: '1rem', marginBottom: '1rem' }}>
