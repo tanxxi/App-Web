@@ -12,6 +12,7 @@ export function PrivateRoute({ allowedRoles }) {
 
   // Si se requiere un rol específico y el usuario no lo tiene
   if (allowedRoles && !allowedRoles.includes(user?.rol)) {
+
     return <Navigate to="/no-autorizado" replace />;
   }
 

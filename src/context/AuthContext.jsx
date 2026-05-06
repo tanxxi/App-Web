@@ -2,7 +2,7 @@ import {createContext, useContext, useState} from 'react'
 
 const AuthContext = createContext(null)
 
-export function AuthProvide({children})
+export function AuthProvider({children})
 {
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
@@ -14,12 +14,13 @@ export function AuthProvide({children})
             user: {
                 id: 1,
                 nombre: "Pepito Perez",
-                rol: "Operador Logístico"
+                rol: "OperadorLogistico"
             }
         }
 
         setUser(MockResponse.user)
         setToken(MockResponse.token)
+        console.log('AuthContext: estado actualizado', MockResponse.user);
     }
 
     const logout = () => {
