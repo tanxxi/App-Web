@@ -2,9 +2,12 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import LoginPage from './pages/LoginPage';
+import OperadorLayout from './pages/Operador/OperadorLayout';
+import OperadorDashboard from './pages/Operador/OperadorDashboard';
+import PedidosPage from './pages/Operador/PedidosPage';
+import RepartidoresPage from './pages/Operador/RepartidoresPage';
+//Aquí deben ir las importaciones de los componentes de las otras interfaces
 import { ROLES } from './constants/roles';
-// Layouts y páginas futuras (por ahora no importados)
-// import OperadorLayout from './pages/operador/OperadorLayout';
 
 function App() {
   const { isAuthenticated, user } = useAuth();
@@ -35,26 +38,33 @@ function App() {
       />
 
       {/* Rutas protegidas para operador y admin (ejemplo) */}
-      <Route element={<PrivateRoute allowedRoles={[ROLES.OPERADOR_LOGISTICO, ROLES.ADMINISTRADOR]} />}>
+      <Route element={<PrivateRoute allowedRoles = {[ROLES.OPERADOR_LOGISTICO]} />}>
         {/* Aquí irán las rutas del operador cuando las crees */}
-        <Route path="/operador" element={<div>Panel del Operador (próximamente)</div>} />
+        <Route path="/operador" element = {<OperadorLayout/>}>
+          <Route index element = {<OperadorDashboard/>}/>
+          <Route path = "pedidos" element = {<PedidosPage/>}/>
+          <Route path = "repartidores" element = {<RepartidoresPage/>}/>
+        </Route>
+      </Route>
+
+      <Route element={<PrivateRoute allowedRoles = {[ROLES.ADMINISTRADOR]}/>}>
       </Route>
 
       {/* Rutas protegidas para repartidor */}
-      <Route element={<PrivateRoute allowedRoles={[ROLES.REPARTIDOR]} />}>
-        <Route path="/repartidor" element={<div>Panel del Repartidor (próximamente)</div>} />
+      <Route element = {<PrivateRoute allowedRoles={[ROLES.REPARTIDOR]} />}>
+        <Route path = "/repartidor" element = {<div>Panel del Repartidor (próximamente)</div>} />
       </Route>
 
       {/* Rutas protegidas para cliente */}
-      <Route element={<PrivateRoute allowedRoles={[ROLES.CLIENTE]} />}>
-        <Route path="/cliente" element={<div>Panel del Cliente (próximamente)</div>} />
+      <Route element = {<PrivateRoute allowedRoles={[ROLES.CLIENTE]} />}>
+        <Route path = "/cliente" element={<div>Panel del Cliente (próximamente)</div>} />
       </Route>
 
       {/* No autorizado */}
-      <Route path="/no-autorizado" element={<div>No tienes permiso para acceder a esta sección.</div>} />
+      <Route path = "/no-autorizado" element={<div>No tienes permiso para acceder a esta sección.</div>} />
 
       {/* Redirigir raíz */}
-      <Route path="/" element={<Navigate to={isAuthenticated ? getHomePath(user?.rol) : '/login'} replace />} />
+      <Route path = "/" element={<Navigate to = {isAuthenticated ? getHomePath(user?.rol) : '/login'} replace />} />
     </Routes>
   );
 }

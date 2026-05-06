@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-function LoginPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -46,10 +46,11 @@ function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ej. usuario@correo.com"
             disabled={loading}
+            autoComplete = "username"
           />
         </div>
         <div>
-          <label htmlFor="password">Contraseña</label>
+          <label htmlFor="password" >Contraseña</label>
           <input
             id="password"
             type="password"
@@ -57,14 +58,13 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
             disabled={loading}
+            autoComplete = "current-password"
           />
         </div>
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={false}>
           {loading ? 'Verificando…' : 'Entrar'}
         </button>
       </form>
     </div>
   );
 }
-
-export default LoginPage;
