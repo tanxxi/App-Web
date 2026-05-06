@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { ROLES_ARRAY } from '../constants/roles'
 
 export function PrivateRoute({ allowedRoles }) {
   const { isAuthenticated, user } = useAuth();
@@ -19,3 +20,4 @@ export function PrivateRoute({ allowedRoles }) {
   // Si está autorizado, renderiza las rutas hijas
   return <Outlet />;
 }
+
