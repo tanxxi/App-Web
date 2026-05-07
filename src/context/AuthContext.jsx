@@ -16,7 +16,7 @@ export function AuthProvider({children})
             user: {
                 id: 1,
                 nombre: "Pepito Perez",
-                rol: ROLES.OPERADOR_LOGISTICO
+                rol: ROLES.CLIENTE
             }
         }
 
