@@ -1,5 +1,6 @@
 import {createContext, useContext, useState} from 'react'
 import { ROLES } from '../constants/roles';
+import { mockUsuarios } from '../mock/mockUsuarios'; // Instruccion de importacion de usuarios desde el mockUsusarios de forma directa
 
 
 const AuthContext = createContext(null)
@@ -9,41 +10,33 @@ export function AuthProvider({children})
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
 
-    // Cliente
-    {
-        id = 1,
-        nombre = "Pepito Perez",
-        email = "cliente@test.com",
-        password = "1234",
-        rol = ROLES.CLIENTE
-    };
+// Login actualizado
+const login = async (email, password) => {
 
-    // Operador logistico
-    {
-        id = 2;
-        nombre = "Carlos Operador";
-        email = "operador@test.com";
-        password = "1234";
-        rol = ROLES.OPERADOR_LOGISTICO
-    };
+    // Insrtuccion para buscar el usuario desde el mock
+    const userFound = mockUsuarios.find(
+        user =>
+            user.email === email &&
+            user.password === password
+    )
 
-    // Repartidor
-    {
-        id = 3;
-        nombre = "Juan Repartidor";
-        email = "repartidor@test.com";
-        password = "1234";
-        rol = ROLES.REPARTIDOR
-    };
-
-    // Administrador
-    {
-        id = 4;
-        nombre = "Admin Sistema";
-        email = "admin@test.com";
-        password = "1234";
-        rol = ROLES.ADMINISTRADOR
+    // Validacion de credenciales
+    if (!userFound) {
+        throw new Error('Credenciales invalidas')
     }
+
+    // Simulacion de respuesta su existe usuario
+    const mockResponse = {
+        token: "123456", // valor ficticio para simulacion de autenticacion 
+        user: userFound
+    }
+
+    // Almacenamiento de inicio de sesion
+    setUser(mockResponse.user)
+    setToken(mockResponse.token)
+
+    console.log('AuthContext actualizado:', mockResponse.user)
+}
 
     const logout = () => {
         setToken(null)
@@ -53,7 +46,7 @@ export function AuthProvider({children})
     const value = {
         user,
         token,
-        isAuthenticated: !!token, 
+        isAuthenticated: !!token, // se genera autenticacion del sistema
         login,
         logout
     }
