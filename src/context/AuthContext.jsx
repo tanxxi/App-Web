@@ -9,20 +9,40 @@ export function AuthProvider({children})
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
 
-    const login = async (email, password) => {
-        
-        const MockResponse = {
-            token: "123456",
-            user: {
-                id: 1,
-                nombre: "Pepito Perez",
-                rol: ROLES.CLIENTE
-            }
-        }
+    // Cliente
+    {
+        id = 1,
+        nombre = "Pepito Perez",
+        usuario = "cliente@test.com",
+        password = "1234",
+        rol = ROLES.CLIENTE
+    };
 
-        setUser(MockResponse.user)
-        setToken(MockResponse.token)
-        console.log('AuthContext: estado actualizado', MockResponse.user);
+    // Operador logistico
+    {
+        id = 2;
+        nombre = "Carlos Operador";
+        usuario = "operador@test.com";
+        password = "1234";
+        rol = ROLES.OPERADOR_LOGISTICO
+    };
+
+    // Repartidor
+    {
+        id = 3;
+        nombre = "Juan Repartidor";
+        usuario = "repartidor@test.com";
+        password = "1234";
+        rol = ROLES.REPARTIDOR
+    };
+
+    // Administrador
+    {
+        id = 4;
+        nombre = "Admin Sistema";
+        usuario = "admin@test.com";
+        password = "1234";
+        rol = ROLES.ADMINISTRADOR
     }
 
     const logout = () => {
