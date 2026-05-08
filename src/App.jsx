@@ -10,10 +10,9 @@ import DetallePedido from './pages/Operador/DetallePedido'
 import EditarPedido from './pages/Operador/EditarPedido';
 //Aquí deben ir las importaciones de los componentes de las otras interfaces
 import { ROLES } from './constants/roles';
-
 function App() {
   const { isAuthenticated, user } = useAuth();
-  
+
   function getHomePath(rol) {
     switch (rol) {
       case ROLES.ADMINISTRADOR:
@@ -27,7 +26,7 @@ function App() {
         console.warn('Rol desconocido:', rol);
         return '/login';
     }
-}
+  }
 
   return (
     <Routes>

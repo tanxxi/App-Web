@@ -1,6 +1,13 @@
 
+import {useState} from 'react'
 
 export default function DetallePedido()
 {
-    return (<div></div>)
+    const [pedidoPopup, setPedidoPopup] = useState(null);
+
+    return (
+        <div>
+
+        </div>
+    )
 }
