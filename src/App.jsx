@@ -3,12 +3,14 @@ import { useAuth } from './context/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import LoginPage from './pages/LoginPage';
 import { ROLES } from './constants/roles';
-// Layouts y páginas futuras (por ahora no importados)
-// import OperadorLayout from './pages/operador/OperadorLayout';
-
+import OperadorLayout from './components/OperadorLayout';
+import DashboardPage from './pages/DashboardPage';
+import PedidosPage from './pages/PedidosPage';
+import RepartidoresPage from './pages/RepartidoresPage';
+import SeguimientoPage from './pages/SeguimientoPage';
 function App() {
   const { isAuthenticated, user } = useAuth();
-  
+
   function getHomePath(rol) {
     switch (rol) {
       case ROLES.ADMINISTRADOR:
@@ -22,7 +24,7 @@ function App() {
         console.warn('Rol desconocido:', rol);
         return '/login';
     }
-}
+  }
 
   return (
     <Routes>
@@ -34,10 +36,15 @@ function App() {
         }
       />
 
-      {/* Rutas protegidas para operador y admin (ejemplo) */}
+      {/* Rutas protegidas para operador y admin */}
       <Route element={<PrivateRoute allowedRoles={[ROLES.OPERADOR_LOGISTICO, ROLES.ADMINISTRADOR]} />}>
-        {/* Aquí irán las rutas del operador cuando las crees */}
-        <Route path="/operador" element={<div>Panel del Operador (próximamente)</div>} />
+        <Route path="/operador" element={<OperadorLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="pedidos" element={<PedidosPage />} />
+          <Route path="repartidores" element={<RepartidoresPage />} />
+          <Route path="seguimiento" element={<SeguimientoPage />} />
+        </Route>
       </Route>
 
       {/* Rutas protegidas para repartidor */}

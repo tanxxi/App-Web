@@ -1,0 +1,107 @@
+.sidebar {
+  width: 260px;
+  background-color: var(--surface-color); /* Sidebar claro, mucho más limpio, formal y corporativo */
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 1px solid var(--border-color);
+  z-index: 20;
+}
+
+.logo {
+  padding: 1.5rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.logo span {
+  font-size: 1.3rem;
+}
+
+.nav {
+  flex: 1;
+  padding: 1.5rem 0.75rem;
+  overflow-y: auto;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.nav li a {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: all 0.15s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.nav li a:hover {
+  background-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.nav li a.active {
+  background-color: var(--border-light);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: none; /* Sin sombras coloridas */
+  border-left: 3px solid var(--primary-color);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding-left: calc(1rem - 3px);
+}
+
+.icon {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.nav li a.active .icon {
+  opacity: 1;
+}
+
+.footer {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 0.65rem;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logoutBtn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #ef4444;
+}
