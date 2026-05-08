@@ -15,6 +15,7 @@ export default function LoginPage() {
       setError('Por favor ingresa usuario y contraseña.');
       return;
     }
+
     setLoading(true);
     setError(null);
 

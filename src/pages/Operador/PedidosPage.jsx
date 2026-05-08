@@ -96,9 +96,9 @@ export default function PedidosPage()
                                 <td>{p.estado}</td>
                                 <td>{p.fecha}</td>
                                 <td>
-                                    <Link to = {'/operador/pedidos/${p.id}'}> Ver </Link>
-                                    <button onClick={() => alert('Editar ${p.id} (mock)')}> Editar </button>
-                                    <button  onClick={() => alert('Eliminar ${p.id} (mock)')}> Eliminar </button>
+                                    <Link to = {`/operador/pedidos/${p.id}`}> Ver </Link>
+                                    <button onClick={() => alert(`Editar ${p.id} (mock)`)}> Editar </button>
+                                    <button  onClick={() => alert(`Eliminar ${p.id} (mock)`)}> Eliminar </button>
                                 </td>
                             </tr>
                         ))
