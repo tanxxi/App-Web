@@ -13,7 +13,7 @@ export function AuthProvider({children})
     {
         id = 1,
         nombre = "Pepito Perez",
-        usuario = "cliente@test.com",
+        email = "cliente@test.com",
         password = "1234",
         rol = ROLES.CLIENTE
     };
@@ -22,7 +22,7 @@ export function AuthProvider({children})
     {
         id = 2;
         nombre = "Carlos Operador";
-        usuario = "operador@test.com";
+        email = "operador@test.com";
         password = "1234";
         rol = ROLES.OPERADOR_LOGISTICO
     };
@@ -31,7 +31,7 @@ export function AuthProvider({children})
     {
         id = 3;
         nombre = "Juan Repartidor";
-        usuario = "repartidor@test.com";
+        email = "repartidor@test.com";
         password = "1234";
         rol = ROLES.REPARTIDOR
     };
@@ -40,7 +40,7 @@ export function AuthProvider({children})
     {
         id = 4;
         nombre = "Admin Sistema";
-        usuario = "admin@test.com";
+        email = "admin@test.com";
         password = "1234";
         rol = ROLES.ADMINISTRADOR
     }
