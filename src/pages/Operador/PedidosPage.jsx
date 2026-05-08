@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 
 // Pedidos para realizar las pruebas de interfaz
 const PEDIDOS_MOCK = [
@@ -24,6 +24,7 @@ export default function PedidosPage()
     const[filtroRepartidorID, setFiltroRepartidorID] = useState('');
     const[filtroFechaDesde, setFiltroFechaDesde] = useState('');
     const[filtroFechaHasta, setFiltroFechaHasta] = useState('');
+    const navigate = useNavigate();
 
     const pedidosFiltrados = PEDIDOS_MOCK.filter(p => {
         if (filtroEstado !== 'Todos' && p.estado !== filtroEstado) return false;
@@ -96,8 +97,8 @@ export default function PedidosPage()
                                 <td>{p.estado}</td>
                                 <td>{p.fecha}</td>
                                 <td>
-                                    <Link to = {`/operador/pedidos/${p.id}`}> Ver </Link>
-                                    <button onClick={() => alert(`Editar ${p.id} (mock)`)}> Editar </button>
+                                    <button onClick = {() => navigate(`/operador/pedidos/${p.id}`)}> Detalle </button>
+                                    <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}> Editar </button>
                                     <button  onClick={() => alert(`Eliminar ${p.id} (mock)`)}> Eliminar </button>
                                 </td>
                             </tr>

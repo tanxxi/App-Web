@@ -7,6 +7,7 @@ import OperadorDashboard from './pages/Operador/OperadorDashboard';
 import PedidosPage from './pages/Operador/PedidosPage';
 import RepartidoresPage from './pages/Operador/RepartidoresPage';
 import DetallePedido from './pages/Operador/DetallePedido'
+import EditarPedido from './pages/Operador/EditarPedido';
 //Aquí deben ir las importaciones de los componentes de las otras interfaces
 import { ROLES } from './constants/roles';
 
@@ -45,6 +46,7 @@ function App() {
           <Route index element = {<OperadorDashboard/>}/>
           <Route path = "pedidos" element = {<PedidosPage/>}/>
           <Route path = "pedidos/:id" element = {<DetallePedido/>}/>
+          <Route path = "pedidos/:id/editar" element = {<EditarPedido/>}/>
           <Route path = "repartidores" element = {<RepartidoresPage/>}/>
         </Route>
       </Route>
