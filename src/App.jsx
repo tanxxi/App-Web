@@ -37,7 +37,7 @@ function App() {
         }
       />
 
-      {/* Rutas protegidas para operador y admin (ejemplo) */}
+      {/* Rutas protegidas para operador */}
       <Route element={<PrivateRoute allowedRoles = {[ROLES.OPERADOR_LOGISTICO]} />}>
         {/* Aquí irán las rutas del operador cuando las crees */}
         <Route path="/operador" element = {<OperadorLayout/>}>
@@ -47,6 +47,7 @@ function App() {
         </Route>
       </Route>
 
+      {/* Rutas protegidas para admin */}
       <Route element={<PrivateRoute allowedRoles = {[ROLES.ADMINISTRADOR]}/>}>
       </Route>
 

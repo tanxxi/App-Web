@@ -1,4 +1,4 @@
-.counter {
+ .counter {
   font-size: 16px;
   padding: 5px 10px;
   border-radius: 5px;
@@ -56,7 +56,7 @@
   }
 }
 
-#center {
+ center {
   display: flex;
   flex-direction: column;
   gap: 25px;

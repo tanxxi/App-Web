@@ -27,10 +27,12 @@ export default function LoginPage() {
     }
   };
 
+
+
   return (
     <div>
       <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit = {handleSubmit}>
         {error && (
           <div style={{ background: '#fff0f0', padding: '1rem', marginBottom: '1rem' }}>
             <span>⚠️ {error}</span>
@@ -38,13 +40,13 @@ export default function LoginPage() {
           </div>
         )}
         <div>
-          <label htmlFor="email">Usuario / Email</label>
+          <label htmlFor="email">Email</label>
           <input
             id="email"
-            type="text"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ej. usuario@correo.com"
+            placeholder = "ej. username@gmail.com"
             disabled={loading}
             autoComplete = "username"
           />
