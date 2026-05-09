@@ -43,8 +43,9 @@ export default function RepartidoresPage() {
           type = "text"
           placeholder = "Filtrar por capacidad"
           value = {filtroCapacidad}
+          min ="0"
+          max = "100"
           onChange = {e => setFiltroCapacidad(e.target.value)}
-          placeholder = "ej: 100"
         />
       </div>
 
