@@ -14,15 +14,23 @@ export default function PedidosPage()
     const[filtroRepartidorID, setFiltroRepartidorID] = useState('');
     const[filtroFechaDesde, setFiltroFechaDesde] = useState('');
     const[filtroFechaHasta, setFiltroFechaHasta] = useState('');
+    const[filtroUbicacion, setFiltroUbicacion] = useState('');
+    const[filtroPedidoID, setFiltroPedidoID] = useState('');
+
     const [horaDesde, setHoraDesde] = useState('');
     const [horaHasta, setHoraHasta] = useState('');
+    const [ordenFecha, setOrdenFecha] = useState('desc');
     const navigate = useNavigate();
 
     const pedidosFiltrados = PEDIDOS_MOCK.filter(p => {
+
         if (filtroEstado !== 'Todos' && p.estado !== filtroEstado) return false;
         if (filtroClienteID && !p.clienteId.toLowerCase().includes(filtroClienteID.toLowerCase())) return false;
         if (filtroRepartidorID && (!p.repartidorId || !p.repartidorId.toLowerCase().includes(filtroRepartidorID.toLowerCase()))) return false;
         if (filtroFechaDesde && p.fecha < filtroFechaDesde) return false;
+        if (filtroUbicacion && (!p.ubicacion || !p.ubicacion.toLowerCase().includes(filtroUbicacion.toLowerCase()))) return false;
+        if (filtroPedidoID && !p.id.toLowerCase().includes(filtroPedidoID.toLowerCase())) return false;
+
          // filtro por fecha (solo la parte de la fecha)
         if (filtroFechaDesde || filtroFechaHasta) {
             const fechaPart = p.fecha.split(' ')[0]; // "2026-05-05"
@@ -35,8 +43,15 @@ export default function PedidosPage()
             if (horaDesde && horaPart < horaDesde) return false;
             if (horaHasta && horaPart > horaHasta) return false;
         }
+
         return true;
     })
+
+    const pedidosFiltradosYOrdenados = [...pedidosFiltrados].sort((a, b) => {
+        const fechaA = new Date(a.fecha);
+        const fechaB = new Date(b.fecha);
+        return ordenFecha === 'desc' ? fechaB - fechaA : fechaA - fechaB;
+    });
 
     return(
         <div>
@@ -48,6 +63,17 @@ export default function PedidosPage()
                     <select value ={filtroEstado} onChange = {e => setFiltroEstado(e.target.value)}>
                         {ESTADOS.map(e=> <option key = {e}> {e} </option>)}
                     </select>
+                </label>
+
+                <label>
+                    Ubicación:
+                    <input
+                    type="text"
+                    value={filtroUbicacion}
+                    onChange={e => setFiltroUbicacion(e.target.value)}
+                    placeholder="ej. Calle 100 #13-39"
+                    size="15"
+                    />
                 </label>
 
                 {/*Se filtra por hora*/}
@@ -69,17 +95,24 @@ export default function PedidosPage()
                     />
                 </label>
 
-                {/* Se filtra la búsqueda de los pedidos según el ID del cliente*/}
+                {/* Se filtra la búsqueda de los pedidos según el ID del cliente */}
                 <label> ID cliente: 
                     <input type = "text" value = {filtroClienteID} 
                     onChange = {e => setFiltroClienteID(e.target.value)} placeholder = "ej. C1" size = "6"/>
                 </label>
 
-                 {/* Se filtra la búsqueda de los pedidos según el ID del repartidor*/}
+                 {/* Se filtra la búsqueda de los pedidos según el ID del repartidor */}
                 <label> ID repartidor: 
                     <input type = "text" value = {filtroRepartidorID} 
                     onChange = {e => setFiltroRepartidorID(e.target.value)} placeholder = "ej. R1" size = "6"/>
                 </label>
+
+                {/* Se filtra la búsqueda de los pedidos según el ID del mismo */}
+                <label> ID pedido: 
+                    <input type = "text" value = {filtroPedidoID} 
+                    onChange = {e => setFiltroPedidoID(e.target.value)} placeholder = "ej. R1" size = "6"/>
+                </label>
+
 
                 {/* Se filtra la búsqueda de los pedidos según la fecha de comienzo*/}
                 <label> Desde: 
@@ -99,36 +132,43 @@ export default function PedidosPage()
                         <th> ID </th>
                         <th> Origen </th>
                         <th> Destino </th>
+                        <th> Ubicación </th>
                         <th> Cliente ID </th>
                         <th> Repartidor ID </th>
                         <th> Estado </th>
-                        <th> Fecha </th>
+                        <th onClick={() => setOrdenFecha(prev => prev === 'desc' ? 'asc' : 'desc')} style={{ cursor: 'pointer' }}>
+                            Fecha {ordenFecha === 'desc' ? '▼' : '▲'}
+                        </th>
                         <th> Acciones </th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {pedidosFiltrados.lenght === 0 ? (<tr colspan = "8"> No hay pedidos </tr>) :
-                    (
-                        pedidosFiltrados.map(p => (
-                            <tr key = {p.id}>
-                                <td>{p.id}</td>
-                                <td>{p.origen}</td>
-                                <td>{p.destino}</td>
-                                <td>{p.clienteId}</td>
-                                <td>{p.repartidorId || '-'}</td>
-                                <td>{p.estado}</td>
-                                <td>{p.fecha}</td>
-                                <td>
-                                    <button onClick = {() => navigate(`/operador/pedidos/${p.id}`)}> Detalle </button>
-                                    <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}> Editar </button>
-                                </td>
-                            </tr>
+                    {pedidosFiltradosYOrdenados.length === 0 ? (
+                        <tr>
+                        <td colSpan={9}>No hay pedidos</td>
+                        </tr>
+                    ) : (
+                        pedidosFiltradosYOrdenados.map(p => (
+                        <tr key={p.id}>
+                            <td>{p.id}</td>
+                            <td>{p.origen}</td>
+                            <td>{p.destino}</td>
+                            <td>{p.ubicacion}</td>
+                            <td>{p.clienteId}</td>
+                            <td>{p.repartidorId || '-'}</td>
+                            <td>{p.estado}</td>
+                            <td>{p.fecha}</td>
+                            <td>
+                            <button onClick={() => navigate(`/operador/pedidos/${p.id}`)}>Detalle</button>
+                            <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}>Editar</button>
+                            </td>
+                        </tr>
                         ))
                     )}
                 </tbody>
             </table>
-            <button onClick = {() =>  alert("Nuevp pedido (mock)")}> + Nuevo Pedido </button>
+            <button onClick = {() =>  navigate('/operador/pedidos/nuevo')}> + Nuevo Pedido </button>
         </div>
     )
 }

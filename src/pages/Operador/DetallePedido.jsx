@@ -24,6 +24,7 @@ export default function DetallePedido()
 
             <p>Origen: {pedido.origen}</p>
             <p>Destino: {pedido.destino}</p>
+            <p>Ubicación: {pedido.ubicacion}</p>
             <p>Estado: {pedido.estado}</p>
             <p>ID Repartidor: {pedido.repartidorId || "-"} </p>
             <p>Descripción: {pedido.descripcion} </p>

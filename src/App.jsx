@@ -8,6 +8,8 @@ import PedidosPage from './pages/Operador/PedidosPage';
 import RepartidoresPage from './pages/Operador/RepartidoresPage';
 import DetallePedido from './pages/Operador/DetallePedido'
 import EditarPedido from './pages/Operador/EditarPedido';
+import NuevoPedido from './pages/Operador/NuevoPedido';
+
 //Aquí deben ir las importaciones de los componentes de las otras interfaces
 import { ROLES } from './constants/roles';
 function App() {
@@ -41,12 +43,13 @@ function App() {
 
       {/* Rutas protegidas para operador */}
       <Route element={<PrivateRoute allowedRoles = {[ROLES.OPERADOR_LOGISTICO]} />}>
-        {/* Aquí irán las rutas del operador cuando las crees */}
+        {/* Aquí irán las rutas del operador */}
         <Route path="/operador" element = {<OperadorLayout/>}>
           <Route index element = {<OperadorDashboard/>}/>
           <Route path = "pedidos" element = {<PedidosPage/>}/>
           <Route path = "pedidos/:id" element = {<DetallePedido/>}/>
           <Route path = "pedidos/:id/editar" element = {<EditarPedido/>}/>
+          <Route path = "pedidos/nuevo" element = {<NuevoPedido/>}/>
           <Route path = "repartidores" element = {<RepartidoresPage/>}/>
         </Route>
       </Route>
