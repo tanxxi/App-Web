@@ -16,6 +16,7 @@ function App() {
   function getHomePath(rol) {
     switch (rol) {
       case ROLES.ADMINISTRADOR:
+        return '/admin'
       case ROLES.OPERADOR_LOGISTICO:
         return '/operador';
       case ROLES.REPARTIDOR:
@@ -51,7 +52,7 @@ function App() {
       </Route>
 
       {/* Rutas protegidas para admin */}
-      <Route element={<PrivateRoute allowedRoles = {[ROLES.ADMINISTRADOR]}/>}>
+      <Route elemet={<PrivateRoute allowedRoles = {[ROLES.ADMINISTRADOR]}/>}>
       </Route>
 
       {/* Rutas protegidas para repartidor */}

@@ -1,15 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import {PEDIDOS_MOCK} from '../../mock/mockPedidos'
 
-// El mismo mock que usa PedidosPage (temporalmente)
-const PEDIDOS_MOCK = [
-  { id: 'P001', origen: 'Centro', destino: 'Norte', clienteId: 'C1', descripcion: 'Paquete pequeño', estado: 'Pendiente', fecha: '2026-05-05' },
-  { id: 'P002', origen: 'Sur', destino: 'Este', clienteId: 'C2', descripcion: 'Documentos', estado: 'En tránsito', fecha: '2026-05-04' },
-  { id: 'P003', origen: 'Oeste', destino: 'Centro', clienteId: 'C1', descripcion: 'Varios', estado: 'Entregado', fecha: '2026-05-03' },
-  { id: 'P004', origen: 'Norte', destino: 'Sur', clienteId: 'C3', descripcion: 'Electrónicos', estado: 'Asignado', fecha: '2026-05-05' },
-  { id: 'P005', origen: 'Este', destino: 'Oeste', clienteId: 'C2', descripcion: 'Libros', estado: 'Cancelado', fecha: '2026-05-02' },
-];
 
 export default function FormularioPedidoPage() {
 
@@ -21,6 +14,7 @@ export default function FormularioPedidoPage() {
     origen: '',
     destino: '',
     clienteId: '',
+    repartidorId: '',
     descripcion: '',
   });
 
@@ -39,6 +33,8 @@ export default function FormularioPedidoPage() {
                 origen: pedido.origen || '',
                 destino: pedido.destino || '',
                 clienteId: pedido.clienteId || '',
+                repartidorId: pedido.repartidorId || '',
+                estado: pedido.estado || '',
                 descripcion: pedido.descripcion || '',
             });
         }
@@ -55,7 +51,11 @@ export default function FormularioPedidoPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Mock de guardado
-    alert(`Pedido ${id} actualizado (mock)\nOrigen: ${formData.origen}\nDestino: ${formData.destino}\nCliente: ${formData.clienteId}\nDescripción: ${formData.descripcion}`);
+    alert(`Pedido ${id} actualizado (mock)
+      \nOrigen: ${formData.origen}\nDestino: ${formData.destino}
+      \nCliente: ${formData.clienteId}\nRepartidor: ${formData.repartidorId}
+      \nDescripción: ${formData.descripcion}\nEstado: ${formData.estado}`
+    );
     navigate('/operador/pedidos');
   };
 
@@ -81,10 +81,22 @@ export default function FormularioPedidoPage() {
         </label>
         <br />
         <label>
+          ID Repartidor:
+          <input type="text" name="repartidorId" value={formData.repartidorId} onChange={handleChange}/>
+        </label>
+        <br />
+        <label>
           Descripción:
           <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} rows="3" />
         </label>
         <br />
+        <label><strong>Cambiar estado:</strong></label>
+        <select name = "estado" value = {formData.estado} onChange = {handleChange}>
+          <option value = ""> -- Mantener actual --</option>
+          <option value = "Asignado"> Asignado </option>
+          <option value = "Entregado"> Entregado </option>
+        </select>
+        <br/>
         <button type="submit">Guardar Cambios</button>
         <button type="button" onClick={() => navigate('/operador/pedidos')}>Cancelar</button>
       </form>

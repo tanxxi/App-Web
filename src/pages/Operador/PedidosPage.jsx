@@ -1,17 +1,7 @@
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom'
-
-// Pedidos para realizar las pruebas de interfaz
-const PEDIDOS_MOCK = [
-  { id: 'P001', origen: 'Centro', destino: 'Norte', clienteId: 'C1', repartidorId: null, estado: 'Pendiente', fecha: '2026-05-05 09:00' },
-  { id: 'P002', origen: 'Sur', destino: 'Este', clienteId: 'C2', repartidorId: 'R1', estado: 'En tránsito', fecha: '2026-05-04 14:30' },
-  { id: 'P003', origen: 'Oeste', destino: 'Centro', clienteId: 'C1', repartidorId: 'R2', estado: 'Entregado', fecha: '2026-05-03 10:00' },
-  { id: 'P004', origen: 'Norte', destino: 'Sur', clienteId: 'C3', repartidorId: 'R1', estado: 'Asignado', fecha: '2026-05-05 11:15' },
-  { id: 'P005', origen: 'Este', destino: 'Oeste', clienteId: 'C2', repartidorId: null, estado: 'Cancelado', fecha: '2026-05-02 08:00' },
-]
-
-//Los estados de los pedidos
-const ESTADOS = ['Todos', 'Pendiente', 'Asignado', 'En tránsito', 'Entregado', 'Cancelado']
+import {PEDIDOS_MOCK} from '../../mock/mockPedidos';
+import {ESTADOS} from '../../constants/estados'
 
 
 export default function PedidosPage()
@@ -24,6 +14,8 @@ export default function PedidosPage()
     const[filtroRepartidorID, setFiltroRepartidorID] = useState('');
     const[filtroFechaDesde, setFiltroFechaDesde] = useState('');
     const[filtroFechaHasta, setFiltroFechaHasta] = useState('');
+    const [horaDesde, setHoraDesde] = useState('');
+    const [horaHasta, setHoraHasta] = useState('');
     const navigate = useNavigate();
 
     const pedidosFiltrados = PEDIDOS_MOCK.filter(p => {
@@ -31,7 +23,18 @@ export default function PedidosPage()
         if (filtroClienteID && !p.clienteId.toLowerCase().includes(filtroClienteID.toLowerCase())) return false;
         if (filtroRepartidorID && (!p.repartidorId || !p.repartidorId.toLowerCase().includes(filtroRepartidorID.toLowerCase()))) return false;
         if (filtroFechaDesde && p.fecha < filtroFechaDesde) return false;
-        if (filtroFechaHasta && p.fecha > filtroFechaHasta + ' 23:59:59') return false;
+         // filtro por fecha (solo la parte de la fecha)
+        if (filtroFechaDesde || filtroFechaHasta) {
+            const fechaPart = p.fecha.split(' ')[0]; // "2026-05-05"
+            if (filtroFechaDesde && fechaPart < filtroFechaDesde) return false;
+            if (filtroFechaHasta && fechaPart > filtroFechaHasta) return false;
+        }
+        // filotr por hora (solo la parte de la hora)
+        if (horaDesde || horaHasta) {
+            const horaPart = p.fecha.split(' ')[1]?.substring(0, 5) || ''; // "09:30"
+            if (horaDesde && horaPart < horaDesde) return false;
+            if (horaHasta && horaPart > horaHasta) return false;
+        }
         return true;
     })
 
@@ -39,11 +42,31 @@ export default function PedidosPage()
         <div>
             <h1> Gestión de Pedidos </h1>
             <div>
+
                 {/* Se filtra la búsqueda de los pedidos a su estado*/}
                 <label> Estado:
                     <select value ={filtroEstado} onChange = {e => setFiltroEstado(e.target.value)}>
                         {ESTADOS.map(e=> <option key = {e}> {e} </option>)}
                     </select>
+                </label>
+
+                {/*Se filtra por hora*/}
+                <label>
+                    Hora desde:
+                    <input
+                    type="time"
+                    value={horaDesde}
+                    onChange={e => setHoraDesde(e.target.value)}
+                    />
+                </label>
+
+                <label>
+                    Hora hasta:
+                    <input
+                    type="time"
+                    value={horaHasta}
+                    onChange={e => setHoraHasta(e.target.value)}
+                    />
                 </label>
 
                 {/* Se filtra la búsqueda de los pedidos según el ID del cliente*/}
@@ -99,7 +122,6 @@ export default function PedidosPage()
                                 <td>
                                     <button onClick = {() => navigate(`/operador/pedidos/${p.id}`)}> Detalle </button>
                                     <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}> Editar </button>
-                                    <button  onClick={() => alert(`Eliminar ${p.id} (mock)`)}> Eliminar </button>
                                 </td>
                             </tr>
                         ))
@@ -109,5 +131,4 @@ export default function PedidosPage()
             <button onClick = {() =>  alert("Nuevp pedido (mock)")}> + Nuevo Pedido </button>
         </div>
     )
-
 }
