@@ -30,7 +30,7 @@ function EstadoSelector({ pedido, onUpdate }) {
         
         {pedido.estado === 'Asignado' && (
           <button 
-            onClick={() => handleUpdate('En Tránsito')}
+            onClick={() => handleUpdate('EnTransito')}
             disabled={loading}
             style={btnStyle('#0f172a')} // Dark slate
           >
@@ -38,7 +38,7 @@ function EstadoSelector({ pedido, onUpdate }) {
           </button>
         )}
 
-        {pedido.estado === 'En Tránsito' && (
+        {pedido.estado === 'EnTransito' && (
           <button 
             onClick={() => handleUpdate('Entregado')}
             disabled={loading}

@@ -9,6 +9,7 @@ export default function PerfilPage() {
     email: user?.email || '',
     telefono: '300 123 4567', // Mock de datos adicionales
     vehiculo: 'Motocicleta (Placa: ABC-123)',
+    capacidad: '50%',
   });
   const [saved, setSaved] = useState(false);
 
@@ -83,6 +84,18 @@ export default function PerfilPage() {
                 className={styles.input}
               />
               <span className={styles.hint}>Actualiza tu vehículo si ha cambiado para ajustar la capacidad de carga.</span>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Capacidad del Vehículo</label>
+              <input 
+                type="text" 
+                name="capacidad"
+                value={formData.capacidad} 
+                onChange={handleChange}
+                className={styles.input}
+                placeholder="Ej. 50% o 20kg"
+              />
             </div>
 
             <button type="submit" className={styles.submitBtn}>Guardar Cambios</button>
