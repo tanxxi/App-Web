@@ -27,6 +27,7 @@ export default function PedidosPage()
         horaHasta: '',
         ubicacion: '',
         id: 0,
+        orden: 'desc',
     });
 
     useEffect(() => {
@@ -37,7 +38,7 @@ export default function PedidosPage()
         }
 
         setLoading(true);
-        fetchPedidos({ ...filtros, limite })
+        fetchPedidos({ ...filtros, limite, ordenFecha})
             .then(data => {
             setPedidos(data);
             setLoading(false);
@@ -46,7 +47,7 @@ export default function PedidosPage()
             console.error(err);
             setLoading(false);
             });
-        }, [limite, filtros]
+        }, [limite, filtros, ordenFecha]
     );
 
     const pedidosFiltrados = limite <= 15
@@ -157,8 +158,10 @@ export default function PedidosPage()
                         <th> Cliente ID </th>
                         <th> Repartidor ID </th>
                         <th> Estado </th>
-                        <th onClick={() => setOrdenFecha(prev => prev === 'desc' ? 'asc' : 'desc')} style={{ cursor: 'pointer' }}>
-                            Fecha {ordenFecha === 'desc' ? '▼' : '▲'}
+                        <th onClick={() => handleFiltroChange('orden', filtros.orden === 'desc' ? 'asc' : 'desc')}
+                        style={{ cursor: 'pointer' }}
+                        >
+                        Fecha {filtros.orden === 'desc' ? '▼' : '▲'}
                         </th>
                         <th> Acciones </th>
                     </tr>
