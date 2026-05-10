@@ -16,6 +16,7 @@ export default function FormularioPedidoPage() {
     clienteId: '',
     repartidorId: '',
     descripcion: '',
+    nombre: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -78,6 +79,11 @@ export default function FormularioPedidoPage() {
         <label>
           Ubicacion:
           <input type="text" name="ubicacion" value={formData.ubicacion} onChange={handleChange} required />
+        </label>
+        <br />
+        <label>
+          Nombre (cliente):
+          <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
         </label>
         <br />
         <label>

@@ -24,12 +24,14 @@ export default function DetallePedido()
 
             <p>Origen: {pedido.origen}</p>
             <p>Destino: {pedido.destino}</p>
+            <p>Fecha (hora): {pedido.fecha}</p>
             <p>Ubicación: {pedido.ubicacion}</p>
             <p>Estado: {pedido.estado}</p>
             <p>ID Repartidor: {pedido.repartidorId || "-"} </p>
+            <p>ID Cliente: {pedido.clienteId}</p>
             <p>Descripción: {pedido.descripcion} </p>
 
-            <button onClick={() => navigate('/operador/pedidos')}> Exit </button>
+            <button onClick={() => navigate('/operador/pedidos')}> Volver </button>
         </div>
     );
 
