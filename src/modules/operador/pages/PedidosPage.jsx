@@ -28,9 +28,9 @@ export default function PedidosPage()
     para pasar el argumento de limite, y los otros argumentos de filtrado
     una vez los tengamos listos
      */
-    const pedidosFiltrados = PEDIDOS_MOCK.slice(0, limite)
+    const pedidosCortados = PEDIDOS_MOCK.slice(0, limite)
 
-    pedidosFiltrados.filter(p => {
+    const pedidosFiltrados = pedidosCortados.filter(p => {
 
         if (filtroEstado !== 'Todos' && p.estado !== filtroEstado) return false;
         if (filtroClienteID && parseInt(filtroClienteID) !== p.clienteId) return false;
