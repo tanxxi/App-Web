@@ -1,13 +1,15 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { PrivateRoute } from './components/PrivateRoute';
-import LoginPage from './pages/LoginPage';
+import { PrivateRoute } from './modules/auth/components/PrivateRoute';
+import LoginPage from './modules/auth/pages/LoginPage';
 import { ROLES } from './constants/roles';
-import OperadorLayout from './components/OperadorLayout';
-import DashboardPage from './pages/DashboardPage';
-import PedidosPage from './pages/PedidosPage';
-import RepartidoresPage from './pages/RepartidoresPage';
-import SeguimientoPage from './pages/SeguimientoPage';
+import OperadorLayout from './modules/operador/components/OperadorLayout';
+import DashboardPage from './modules/operador/pages/DashboardPage';
+import PedidosPage from './modules/operador/pages/PedidosPage';
+import RepartidoresPage from './modules/operador/pages/RepartidoresPage';
+import SeguimientoPage from './modules/operador/pages/SeguimientoPage';
+import DashboardRepartidor from './modules/repartidor/pages/DashboardRepartidor';
+import PerfilPage from './modules/repartidor/pages/PerfilPage';
 function App() {
   const { isAuthenticated, user } = useAuth();
 
@@ -49,7 +51,10 @@ function App() {
 
       {/* Rutas protegidas para repartidor */}
       <Route element={<PrivateRoute allowedRoles={[ROLES.REPARTIDOR]} />}>
-        <Route path="/repartidor" element={<div>Panel del Repartidor (próximamente)</div>} />
+        <Route path="/repartidor" element={<OperadorLayout />}>
+          <Route index element={<DashboardRepartidor />} />
+          <Route path="perfil" element={<PerfilPage />} />
+        </Route>
       </Route>
 
       {/* Rutas protegidas para cliente */}

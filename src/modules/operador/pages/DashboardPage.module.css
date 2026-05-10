@@ -1,0 +1,173 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.title {
+  font-size: 1.5rem; /* Un poco más sobria y contenida */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.kpiCard {
+  background: var(--surface-color);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color); /* Bordes grises finos y definidos en vez de sombras grandes */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kpiCard::before {
+  display: none; /* Eliminamos las líneas de color en el lateral para un look ultra sobrio */
+}
+
+.kpiCard h3 {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpiNumber {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--border-color);
+}
+
+.timeline li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.timeline li:last-child {
+  margin-bottom: 0;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--surface-color);
+  border: 2px solid var(--text-primary);
+}
+
+.time {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.timeline p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th, .table td {
+  padding: 0.75rem 0.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.5rem;
+}
+
+.table td {
+  font-size: 0.9rem;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-md); /* Etiquetas cuadradas profesionales en vez de pastillas redondas */
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+
+/* Colores de badges muy tenues y elegantes (sobrios) */
+.badge.Pendiente { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; }
+.badge.Asignado { background-color: #f1f5f9; color: #1e293b; border-color: #cbd5e1; }
+.badge.EnTransito { background-color: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
+.badge.Entregado { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.badge.Cancelado { background-color: #fef2f2; color: #b91c1c; border-color: #fecaca; }
