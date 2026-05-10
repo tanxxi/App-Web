@@ -1,0 +1,119 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.trackingSection {
+  margin-bottom: 0.5rem;
+}
+
+.pedidosSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.8rem;
+}
+
+.pedidoId {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+
+/* Colores de badges muy tenues y elegantes (sobrios) */
+.badge.Pendiente { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; }
+.badge.Asignado { background-color: #f1f5f9; color: #1e293b; border-color: #cbd5e1; }
+.badge.EnTránsito { background-color: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
+.badge.Entregado { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.badge.Cancelado { background-color: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+.cardBody {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.cardBody p {
+  margin: 0.25rem 0;
+}
+
+.cardBody strong {
+  color: var(--text-primary);
+}
+
+.price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 0.5rem;
+}
+
+.cardFooter {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.loader {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-tertiary);
+  animation: pulse 1.5s infinite;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-tertiary);
+  background: var(--bg-color);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

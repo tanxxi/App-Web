@@ -1,17 +1,26 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { PrivateRoute } from './components/PrivateRoute';
-import LoginPage from './pages/LoginPage';
-import OperadorLayout from './pages/Operador/OperadorLayout';
-import OperadorDashboard from './pages/Operador/OperadorDashboard';
-import PedidosPage from './pages/Operador/PedidosPage';
-import RepartidoresPage from './pages/Operador/RepartidoresPage';
-import DetallePedido from './pages/Operador/DetallePedido'
-import EditarPedido from './pages/Operador/EditarPedido';
-import NuevoPedido from './pages/Operador/NuevoPedido';
-
-//Aquí deben ir las importaciones de los componentes de las otras interfaces
+import { PrivateRoute } from './modules/auth/components/PrivateRoute';
+import LoginPage from './modules/auth/pages/LoginPage';
 import { ROLES } from './constants/roles';
+
+// Importaciones de operador logístico
+
+import OperadorLayoutSpecific from './modules/operador/pages/OperadorLayoutSpecific';
+import OperadorDashboard from './modules/operador/pages/OperadorDashboard';
+import PedidosPage from './modules/operador/pages/PedidosPage';
+import RepartidoresPage from './modules/operador/pages/RepartidoresPage';
+import NuevoPedido from './modules/operador/pages/NuevoPedido';
+import EditarPedido from './modules/operador/pages/EditarPedido';
+import DetallePedido from './modules/operador/pages/DetallePedido';
+
+// Importaciones de repartidor
+
+import OperadorLayout from './modules/operador/components/OperadorLayout'
+import DashboardRepartidor from './modules/repartidor/pages/DashboardRepartidor';
+import PerfilPage from './modules/repartidor/pages/PerfilPage';
+
+
 function App() {
   const { isAuthenticated, user } = useAuth();
 
@@ -44,7 +53,7 @@ function App() {
       {/* Rutas protegidas para operador */}
       <Route element={<PrivateRoute allowedRoles = {[ROLES.OPERADOR_LOGISTICO]} />}>
         {/* Aquí irán las rutas del operador */}
-        <Route path="/operador" element = {<OperadorLayout/>}>
+        <Route path="/operador" element = {<OperadorLayoutSpecific/>}>
           <Route index element = {<OperadorDashboard/>}/>
           <Route path = "pedidos" element = {<PedidosPage/>}/>
           <Route path = "pedidos/:id" element = {<DetallePedido/>}/>
@@ -59,8 +68,11 @@ function App() {
       </Route>
 
       {/* Rutas protegidas para repartidor */}
-      <Route element = {<PrivateRoute allowedRoles={[ROLES.REPARTIDOR]} />}>
-        <Route path = "/repartidor" element = {<div>Panel del Repartidor (próximamente)</div>} />
+      <Route element={<PrivateRoute allowedRoles={[ROLES.REPARTIDOR]} />}>
+        <Route path="/repartidor" element={<OperadorLayout />}>
+          <Route index element={<DashboardRepartidor />} />
+          <Route path="perfil" element={<PerfilPage />} />
+        </Route>
       </Route>
 
       {/* Rutas protegidas para cliente */}
