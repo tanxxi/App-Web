@@ -1,8 +1,8 @@
 import {useNavigate, Outlet, Link} from "react-router-dom";
-import {useAuth} from "../../context/AuthContext"
-import styles from "./OperadorLayout.module.css"
+import {useAuth} from "../../../context/AuthContext"
+import styles from "./OperadorLayoutSpecific.module.css"
 
-export default function OperadorLayout()
+export default function OperadorLayoutSpecific()
 {
     const {logout} = useAuth();
     const navigate = useNavigate();

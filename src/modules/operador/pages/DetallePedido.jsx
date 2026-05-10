@@ -1,7 +1,7 @@
 import { useParams, useNavigate} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 // Importas el mock o el servicio. Por ahora, el mock directo.
-import {PEDIDOS_MOCK} from '../../mock/mockPedidos';
+import {PEDIDOS_MOCK} from '../../../mock/mockPedidos';
 
 export default function DetallePedido()
 { 

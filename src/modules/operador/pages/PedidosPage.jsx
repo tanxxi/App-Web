@@ -1,104 +1,194 @@
-import { useState, useEffect } from 'react';
-import { getPedidos } from '../../../mock/pedidosMock';
-import styles from './PedidosPage.module.css';
+import {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom'
+import {PEDIDOS_MOCK} from '../../../mock/mockPedidos';
+import {ESTADOS} from '../../../constants/estados'
 
-export default function PedidosPage() {
-  const [pedidos, setPedidos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filtroEstado, setFiltroEstado] = useState('Todos');
 
-  useEffect(() => {
-    const fetchPedidos = async () => {
-      try {
-        const data = await getPedidos();
-        setPedidos(data);
-      } catch (error) {
-        console.error("Error al cargar pedidos:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPedidos();
-  }, []);
+export default function PedidosPage()
+{   
+    /*
+    Hooks para los filtros de la tabla 
+    */
+    const[filtroEstado, setFiltroEstado] = useState('Todos');
+    const[filtroClienteID, setFiltroClienteID] = useState('');
+    const[filtroRepartidorID, setFiltroRepartidorID] = useState('');
+    const[filtroFechaDesde, setFiltroFechaDesde] = useState('');
+    const[filtroFechaHasta, setFiltroFechaHasta] = useState('');
+    const[filtroUbicacion, setFiltroUbicacion] = useState('');
+    const[filtroPedidoID, setFiltroPedidoID] = useState('');
+    const[limite, setLimite] = useState(10)
 
-  const pedidosFiltrados = filtroEstado === 'Todos' 
-    ? pedidos 
-    : pedidos.filter(p => p.estado === filtroEstado);
+    const [horaDesde, setHoraDesde] = useState('');
+    const [horaHasta, setHoraHasta] = useState('');
+    const [ordenFecha, setOrdenFecha] = useState('desc');
+    const navigate = useNavigate();
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Gestión de Pedidos</h1>
-        <button className={styles.btnPrimary}>+ Crear Pedido</button>
-      </div>
+    /*
+    Esto es simplemente una simulacion. Necesitamos del back-end
+    para pasar el argumento de limite, y los otros argumentos de filtrado
+    una vez los tengamos listos
+     */
+    const pedidosFiltrados = PEDIDOS_MOCK.slice(0, limite)
 
-      <div className={styles.filters}>
-        <div className={styles.filterGroup}>
-          <label>Filtrar por Estado:</label>
-          <select 
-            value={filtroEstado} 
-            onChange={(e) => setFiltroEstado(e.target.value)}
-            className={styles.select}
-          >
-            <option value="Todos">Todos</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Asignado">Asignado</option>
-            <option value="EnTransito">En Tránsito</option>
-            <option value="Entregado">Entregado</option>
-            <option value="Cancelado">Cancelado</option>
-          </select>
+    pedidosFiltrados.filter(p => {
+
+        if (filtroEstado !== 'Todos' && p.estado !== filtroEstado) return false;
+        if (filtroClienteID && parseInt(filtroClienteID) !== p.clienteId) return false;
+        if (filtroRepartidorID && (!p.repartidorId || parseInt(filtroRepartidorID) !== p.repartidorId)) return false;
+        if (filtroFechaDesde && p.fecha < filtroFechaDesde) return false;
+        if (filtroUbicacion && (!p.ubicacion || !p.ubicacion.toLowerCase().includes(filtroUbicacion.toLowerCase()))) return false;
+        if (filtroPedidoID && parseInt(filtroPedidoID) !== p.id) return false;
+
+        // filtro por fecha (solo la parte de la fecha)
+        if (filtroFechaDesde || filtroFechaHasta) {
+            const fechaPart = p.fecha.split(' ')[0]; // "2026-05-05"
+            if (filtroFechaDesde && fechaPart < filtroFechaDesde) return false;
+            if (filtroFechaHasta && fechaPart > filtroFechaHasta) return false;
+        }
+        // filotr por hora (solo la parte de la hora)
+        if (horaDesde || horaHasta) {
+            const horaPart = p.fecha.split(' ')[1]?.substring(0, 5) || ''; // "09:30"
+            if (horaDesde && horaPart < horaDesde) return false;
+            if (horaHasta && horaPart > horaHasta) return false;
+        }
+
+        return true;
+    })
+
+    const pedidosFiltradosYOrdenados = [...pedidosFiltrados].sort((a, b) => {
+        const fechaA = new Date(a.fecha);
+        const fechaB = new Date(b.fecha);
+        return ordenFecha === 'desc' ? fechaB - fechaA : fechaA - fechaB;
+    });
+
+    return(
+        <div>
+            <h1> Gestión de Pedidos </h1>
+            <div>
+
+                {/* Limite de instancias presentadas*/}
+                <label>
+                    Limite:
+                    <input
+                     type = "number"
+                     value = {limite}
+                     min = "1"
+                     max = "200"
+                     onChange = {e => setLimite(parseInt(e.target.value, 10) || 10)}
+                    />
+                </label>
+
+                {/* Se filtra la búsqueda de los pedidos a su estado*/}
+                <label> Estado:
+                    <select value ={filtroEstado} onChange = {e => setFiltroEstado(e.target.value)}>
+                        {ESTADOS.map(e=> <option key = {e}> {e} </option>)}
+                    </select>
+                </label>
+
+                <label>
+                    Ubicación:
+                    <input
+                    type="text"
+                    value={filtroUbicacion}
+                    onChange={e => setFiltroUbicacion(e.target.value)}
+                    placeholder="ej. Calle 100 #13-39"
+                    size="15"
+                    />
+                </label>
+
+                {/*Se filtra por hora*/}
+                <label>
+                    Hora desde:
+                    <input
+                    type="time"
+                    value={horaDesde}
+                    onChange={e => setHoraDesde(e.target.value)}
+                    />
+                </label>
+
+                <label>
+                    Hora hasta:
+                    <input
+                    type="time"
+                    value={horaHasta}
+                    onChange={e => setHoraHasta(e.target.value)}
+                    />
+                </label>
+
+                {/* Se filtra la búsqueda de los pedidos según el ID del cliente */}
+                <label> ID cliente: 
+                    <input type = "numeric" value = {filtroClienteID} 
+                    onChange = {e => setFiltroClienteID(e.target.value)} placeholder = "ej. 1" size = "6"/>
+                </label>
+
+                 {/* Se filtra la búsqueda de los pedidos según el ID del repartidor */}
+                <label> ID repartidor: 
+                    <input type = "numeric" value = {filtroRepartidorID} 
+                    onChange = {e => setFiltroRepartidorID(e.target.value)} placeholder = "ej. 1" size = "6"/>
+                </label>
+
+                {/* Se filtra la búsqueda de los pedidos según el ID del mismo */}
+                <label> ID pedido: 
+                    <input type = "numeric" value = {filtroPedidoID} 
+                    onChange = {e => setFiltroPedidoID(e.target.value)} placeholder = "ej. 1" size = "6"/>
+                </label>
+
+
+                {/* Se filtra la búsqueda de los pedidos según la fecha de comienzo*/}
+                <label> Desde: 
+                    <input type = "date" value = {filtroFechaDesde} onChange = {e => setFiltroFechaDesde(e.target.value)}/>
+                </label>
+
+                {/* Se filtra la búsqueda de los pedidos según la fecha hasta  */}
+                <label> Hasta:
+                    <input type = "date" value = {filtroFechaHasta} onChange = {e => setFiltroFechaHasta(e.target.value)}/>
+                </label>
+            </div>
+
+
+            <table border = "1">
+                <thead>
+                    <tr>
+                        <th> ID </th>
+                        <th> Origen </th>
+                        <th> Destino </th>
+                        <th> Ubicación </th>
+                        <th> Cliente ID </th>
+                        <th> Repartidor ID </th>
+                        <th> Estado </th>
+                        <th onClick={() => setOrdenFecha(prev => prev === 'desc' ? 'asc' : 'desc')} style={{ cursor: 'pointer' }}>
+                            Fecha {ordenFecha === 'desc' ? '▼' : '▲'}
+                        </th>
+                        <th> Acciones </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {pedidosFiltradosYOrdenados.length === 0 ? (
+                        <tr>
+                        <td colSpan={9}>No hay pedidos</td>
+                        </tr>
+                    ) : (
+                        pedidosFiltradosYOrdenados.map(p => (
+                        <tr key={p.id}>
+                            <td>{p.id}</td>
+                            <td>{p.origen}</td>
+                            <td>{p.destino}</td>
+                            <td>{p.ubicacion}</td>
+                            <td>{p.clienteId}</td>
+                            <td>{p.repartidorId || '-'}</td>
+                            <td>{p.estado}</td>
+                            <td>{p.fecha}</td>
+                            <td>
+                            <button onClick={() => navigate(`/operador/pedidos/${p.id}`)}>Detalle</button>
+                            <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}>Editar</button>
+                            </td>
+                        </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+            <button onClick = {() =>  navigate('/operador/pedidos/nuevo')}> + Nuevo Pedido </button>
         </div>
-      </div>
-
-      {loading ? (
-        <div className={styles.loadingState}>Cargando pedidos...</div>
-      ) : (
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Origen</th>
-                <th>Destino</th>
-                <th>Estado</th>
-                <th>Repartidor</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pedidosFiltrados.map(pedido => (
-                <tr key={pedido.id}>
-                  <td>#{pedido.id}</td>
-                  <td>{pedido.cliente}</td>
-                  <td>{pedido.origen}</td>
-                  <td>{pedido.destino}</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles[pedido.estado]}`}>
-                      {pedido.estado}
-                    </span>
-                  </td>
-                  <td>{pedido.repartidor || <span className={styles.unassigned}>Sin asignar</span>}</td>
-                  <td>{pedido.fecha}</td>
-                  <td>
-                    <div className={styles.actions}>
-                      <button className={styles.btnIcon} title="Ver detalle">👁️</button>
-                      <button className={styles.btnIcon} title="Editar">✏️</button>
-                      <button className={styles.btnIcon} title="Asignar repartidor">🚚</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {pedidosFiltrados.length === 0 && (
-                <tr>
-                  <td colSpan="8" className={styles.emptyState}>No se encontraron pedidos.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
+    )
 }

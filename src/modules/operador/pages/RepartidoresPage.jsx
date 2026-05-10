@@ -1,79 +1,130 @@
-import { useState, useEffect } from 'react';
-import { getRepartidores } from '../../../mock/repartidoresMock';
-import styles from './RepartidoresPage.module.css';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { repartidoresMock } from '../../../data/repartidoresMock';
 
 export default function RepartidoresPage() {
-  const [repartidores, setRepartidores] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  const [repartidores, setRepartidores] = useState(repartidoresMock);
+  const [filtroNombre, setFiltroNombre] = useState('');
+  const [filtroId, setFiltroId] = useState(0)
+  const [filtroCapacidadLower, setFiltroCapacidadLower] = useState(0);
+  const [filtroCapacidadUpper, setFiltroCapacidadUpper] = useState(100);
+  const [filtroDisponibilidad, setFiltroDisponibilidad] = useState('');
+  const [limiteInstancias, setLimiteInstancias] = useState(10)
 
-  useEffect(() => {
-    const fetchRepartidores = async () => {
-      try {
-        const data = await getRepartidores();
-        setRepartidores(data);
-      } catch (error) {
-        console.error("Error al cargar repartidores:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRepartidores();
-  }, []);
+  const navigate = useNavigate();
+
+  // Limite de instancias simuladas con mock. 
+  // Esto se debe implementar para que funcione con el back-end
+
+  const filtrados = repartidores.slice(0, limiteInstancias).filter(r => {
+      if(filtroNombre && !r.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) return false;
+      if(filtroId && parseInt(filtroId) !== r.id) return false;
+      if (filtroDisponibilidad !== 'Todos' && !r.estado.toLowerCase().includes(filtroDisponibilidad.toLowerCase())) return false;
+      if((filtroCapacidadLower || filtroCapacidadUpper) && !(r.capacidad <= filtroCapacidadUpper && r.capacidad >= filtroCapacidadLower)) return false;
+      return true;
+    });
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Gestión de Repartidores</h1>
-        <button className={styles.btnPrimary}>+ Nuevo Repartidor</button>
+    <div>
+      <h1>Gestión de Repartidores</h1>
+
+      <div>
+        <input
+          type="text"
+          placeholder="Buscar por nombre"
+          value={filtroNombre}
+          onChange={e => setFiltroNombre(e.target.value)}
+        />
       </div>
 
-      {loading ? (
-        <div className={styles.loadingState}>Cargando repartidores...</div>
-      ) : (
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Estado</th>
-                <th>Capacidad</th>
-                <th>Pedidos Activos</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {repartidores.map(repartidor => (
-                <tr key={repartidor.id}>
-                  <td>#{repartidor.id}</td>
-                  <td>{repartidor.nombre}</td>
-                  <td>
-                    <span className={`${styles.badge} ${styles[repartidor.estado]}`}>
-                      {repartidor.estado}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={styles.capacityBar}>
-                      <div 
-                        className={styles.capacityFill} 
-                        style={{ width: repartidor.capacidad }}
-                      ></div>
-                      <span className={styles.capacityText}>{repartidor.capacidad}</span>
-                    </div>
-                  </td>
-                  <td>{repartidor.pedidosActivos}</td>
-                  <td>
-                    <div className={styles.actions}>
-                      <button className={styles.btnIcon} title="Editar">✏️</button>
-                      <button className={styles.btnIcon} title="Ver pedidos">📦</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+       <div>
+          <label> Estado:
+              <select value ={filtroDisponibilidad} onChange = {e => setFiltroDisponibilidad(e.target.value)}>
+                  <option key = 'Todos'> Todos </option>
+                  <option key = 'Disponible'> Disponible </option>
+                  <option key = 'Ocupado'> Ocupado </option>
+              </select>
+          </label>
+      </div>
+
+      <div>
+        <label>
+          Buscar por id: 
+          <input
+          type = "number"
+          value = {filtroId}
+          min = "0"
+          onChange = {e => setFiltroId(e.target.value)}
+          />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Filtrar por capacidad (cota inferior): 
+          <input
+          type = "number"
+          value = {filtroCapacidadLower}
+          min ="0"
+          max = "100"
+          onChange = {e => setFiltroCapacidadLower(e.target.value)}
+        />
+        </label>
+      </div>
+      
+      <div>
+        <label>
+          Filtrar por capacidad (cota superior):
+          <input
+          type = "number"
+          value = {filtroCapacidadUpper}
+          min = "0"
+          max = "100"
+          onChange = {e => setFiltroCapacidadUpper(e.target.value)}
+          />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Maximo de instancias:
+          <input
+          type = "number"
+          value = {limiteInstancias}
+          min = "1"
+          max = "200"
+          onChange = {e => setLimiteInstancias(parseInt(e.target.value, 10) || 10)}
+          />
+        </label>
+      </div>
+
+      <table border="1">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Capacidad</th>
+            <th>Activos</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtrados.length !== 0 ? (filtrados.map(r => (
+            <tr key={r.id}>
+              <td>{r.id}</td>
+              <td>{r.nombre}</td>
+              <td>{r.email}</td>
+              <td>{r.telefono}</td>
+              <td>{r.capacidad}</td>
+              <td>{r.pedidosActivos}</td>
+              <td>{r.estado}</td>
+            </tr>
+          ))): (<td colSpan = "7"> No se encontraron repartidores </td>)}
+        </tbody>
+      </table>
     </div>
   );
 }
