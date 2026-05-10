@@ -5,14 +5,22 @@ import { repartidoresMock } from '../../data/repartidoresMock';
 export default function RepartidoresPage() {
   const [repartidores, setRepartidores] = useState(repartidoresMock);
   const [filtroNombre, setFiltroNombre] = useState('');
-  const [filtroId, setFiltroId] = useState('')
-  const [filtroCapacidad, setFiltroCapacidad] = useState('');
+  const [filtroId, setFiltroId] = useState(0)
+  const [filtroCapacidadLower, setFiltroCapacidadLower] = useState(0);
+  const [filtroCapacidadUpper, setFiltroCapacidadUpper] = useState(100);
+  const [filtroDisponibilidad, setFiltroDisponibilidad] = useState('');
+  const [limiteInstancias, setLimiteInstancias] = useState(10)
+
   const navigate = useNavigate();
 
-  const filtrados = repartidores.filter(r => {
+  // Limite de instancias simuladas con mock. 
+  // Esto se debe implementar para que funcione con el back-end
+
+  const filtrados = repartidores.slice(0, limiteInstancias).filter(r => {
       if(filtroNombre && !r.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) return false;
-      if(filtroId && r.id !== filtroId) return false;
-      if(filtroCapacidad && r.capacidad !== filtroCapacidad) return false;
+      if(filtroId && parseInt(filtroId) !== r.id) return false;
+      if (filtroDisponibilidad !== 'Todos' && !r.estado.toLowerCase().includes(filtroDisponibilidad.toLowerCase())) return false;
+      if((filtroCapacidadLower || filtroCapacidadUpper) && !(r.capacidad <= filtroCapacidadUpper && r.capacidad >= filtroCapacidadLower)) return false;
       return true;
     });
 
@@ -29,24 +37,65 @@ export default function RepartidoresPage() {
         />
       </div>
 
-      <div>
-        <input
-          type = "text"
-          placeholder = "Buscar por id"
-          value = {filtroId}
-          onChange = {e => setFiltroId(e.target.value)}
-        />
+       <div>
+          <label> Estado:
+              <select value ={filtroDisponibilidad} onChange = {e => setFiltroDisponibilidad(e.target.value)}>
+                  <option key = 'Todos'> Todos </option>
+                  <option key = 'Disponible'> Disponible </option>
+                  <option key = 'Ocupado'> Ocupado </option>
+              </select>
+          </label>
       </div>
 
       <div>
-        <input
-          type = "text"
-          placeholder = "Filtrar por capacidad"
-          value = {filtroCapacidad}
+        <label>
+          Buscar por id: 
+          <input
+          type = "number"
+          value = {filtroId}
+          min = "0"
+          onChange = {e => setFiltroId(e.target.value)}
+          />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Filtrar por capacidad (cota inferior): 
+          <input
+          type = "number"
+          value = {filtroCapacidadLower}
           min ="0"
           max = "100"
-          onChange = {e => setFiltroCapacidad(e.target.value)}
+          onChange = {e => setFiltroCapacidadLower(e.target.value)}
         />
+        </label>
+      </div>
+      
+      <div>
+        <label>
+          Filtrar por capacidad (cota superior):
+          <input
+          type = "number"
+          value = {filtroCapacidadUpper}
+          min = "0"
+          max = "100"
+          onChange = {e => setFiltroCapacidadUpper(e.target.value)}
+          />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Maximo de instancias:
+          <input
+          type = "number"
+          value = {limiteInstancias}
+          min = "1"
+          max = "200"
+          onChange = {e => setLimiteInstancias(parseInt(e.target.value, 10) || 10)}
+          />
+        </label>
       </div>
 
       <table border="1">
@@ -58,10 +107,11 @@ export default function RepartidoresPage() {
             <th>Teléfono</th>
             <th>Capacidad</th>
             <th>Activos</th>
+            <th>Estado</th>
           </tr>
         </thead>
         <tbody>
-          {filtrados.map(r => (
+          {filtrados.length !== 0 ? (filtrados.map(r => (
             <tr key={r.id}>
               <td>{r.id}</td>
               <td>{r.nombre}</td>
@@ -69,8 +119,9 @@ export default function RepartidoresPage() {
               <td>{r.telefono}</td>
               <td>{r.capacidad}</td>
               <td>{r.pedidosActivos}</td>
+              <td>{r.estado}</td>
             </tr>
-          ))}
+          ))): (<td colSpan = "7"> No se encontraron repartidores </td>)}
         </tbody>
       </table>
     </div>

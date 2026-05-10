@@ -11,10 +11,11 @@ export default function NuevoPedido() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!origen || !destino || !clienteId) {
+    if (!origen || !destino || !clienteId || !descripcion) {
       alert('Por favor completa los campos obligatorios (origen, destino, cliente)');
       return;
     }
+
     // Simula creación exitosa
     alert(`Pedido creado con éxito (mock)\nOrigen: ${origen}\nDestino: ${destino}\nCliente: ${clienteId}`);
     navigate('/operador/pedidos');
@@ -36,13 +37,11 @@ export default function NuevoPedido() {
         <br />
         <label>
           Cliente ID:
-          <input type="text" 
+          <input type="numeric" 
           value={clienteId} 
           onChange={e => setClienteId(e.target.value)} 
           required 
-          pattern="^R\d+$"
-          title="Formato: C seguido de números (ej. C1, C25)"
-          placeholder="C1, C2..." />
+          placeholder="ej 1" />
         </label>
         <br />
         <label>

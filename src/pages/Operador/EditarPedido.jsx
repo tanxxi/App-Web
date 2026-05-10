@@ -76,6 +76,11 @@ export default function FormularioPedidoPage() {
         </label>
         <br />
         <label>
+          Ubicacion:
+          <input type="text" name="ubicacion" value={formData.ubicacion} onChange={handleChange} required />
+        </label>
+        <br />
+        <label>
           ID Cliente:
           <input type="text" name="clienteId" value={formData.clienteId} onChange={handleChange} required />
         </label>
@@ -95,10 +100,11 @@ export default function FormularioPedidoPage() {
           <option value = ""> -- Mantener actual --</option>
           <option value = "Asignado"> Asignado </option>
           <option value = "Entregado"> Entregado </option>
+          <option value = "Pendiente"> Pendiente </option>
         </select>
         <br/>
-        <button type="submit">Guardar Cambios</button>
-        <button type="button" onClick={() => navigate('/operador/pedidos')}>Cancelar</button>
+        <button type="submit"> Guardar Cambios </button>
+        <button type="button" onClick={() => navigate('/operador/pedidos')}> Cancelar </button>
       </form>
     </div>
   );

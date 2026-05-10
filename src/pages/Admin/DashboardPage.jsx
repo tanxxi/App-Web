@@ -28,7 +28,7 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Dashboard Operativo</h1>
+      <h1 className={styles.title}>Dashboard </h1>
       
       <div className={styles.kpiGrid}>
         <div className={`${styles.kpiCard} ${styles.warning}`}>

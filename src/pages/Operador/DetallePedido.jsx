@@ -11,7 +11,7 @@ export default function DetallePedido()
 
     useEffect(() => {
     // Busca el pedido en los mocks locales
-    const encontrado = PEDIDOS_MOCK.find(p => p.id === id);
+    const encontrado = PEDIDOS_MOCK.find(p => p.id === parseInt(id));
     setPedido(encontrado);
     }, [id]); // Se ejecuta cuando el ID cambia
 

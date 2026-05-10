@@ -16,22 +16,30 @@ export default function PedidosPage()
     const[filtroFechaHasta, setFiltroFechaHasta] = useState('');
     const[filtroUbicacion, setFiltroUbicacion] = useState('');
     const[filtroPedidoID, setFiltroPedidoID] = useState('');
+    const[limite, setLimite] = useState(10)
 
     const [horaDesde, setHoraDesde] = useState('');
     const [horaHasta, setHoraHasta] = useState('');
     const [ordenFecha, setOrdenFecha] = useState('desc');
     const navigate = useNavigate();
 
-    const pedidosFiltrados = PEDIDOS_MOCK.filter(p => {
+    /*
+    Esto es simplemente una simulacion. Necesitamos del back-end
+    para pasar el argumento de limite, y los otros argumentos de filtrado
+    una vez los tengamos listos
+     */
+    const pedidosFiltrados = PEDIDOS_MOCK.slice(0, limite)
+
+    pedidosFiltrados.filter(p => {
 
         if (filtroEstado !== 'Todos' && p.estado !== filtroEstado) return false;
-        if (filtroClienteID && !p.clienteId.toLowerCase().includes(filtroClienteID.toLowerCase())) return false;
-        if (filtroRepartidorID && (!p.repartidorId || !p.repartidorId.toLowerCase().includes(filtroRepartidorID.toLowerCase()))) return false;
+        if (filtroClienteID && parseInt(filtroClienteID) !== p.clienteId) return false;
+        if (filtroRepartidorID && (!p.repartidorId || parseInt(filtroRepartidorID) !== p.repartidorId)) return false;
         if (filtroFechaDesde && p.fecha < filtroFechaDesde) return false;
         if (filtroUbicacion && (!p.ubicacion || !p.ubicacion.toLowerCase().includes(filtroUbicacion.toLowerCase()))) return false;
-        if (filtroPedidoID && !p.id.toLowerCase().includes(filtroPedidoID.toLowerCase())) return false;
+        if (filtroPedidoID && parseInt(filtroPedidoID) !== p.id) return false;
 
-         // filtro por fecha (solo la parte de la fecha)
+        // filtro por fecha (solo la parte de la fecha)
         if (filtroFechaDesde || filtroFechaHasta) {
             const fechaPart = p.fecha.split(' ')[0]; // "2026-05-05"
             if (filtroFechaDesde && fechaPart < filtroFechaDesde) return false;
@@ -57,6 +65,18 @@ export default function PedidosPage()
         <div>
             <h1> Gestión de Pedidos </h1>
             <div>
+
+                {/* Limite de instancias presentadas*/}
+                <label>
+                    Limite:
+                    <input
+                     type = "number"
+                     value = {limite}
+                     min = "1"
+                     max = "200"
+                     onChange = {e => setLimite(parseInt(e.target.value, 10) || 10)}
+                    />
+                </label>
 
                 {/* Se filtra la búsqueda de los pedidos a su estado*/}
                 <label> Estado:
@@ -97,20 +117,20 @@ export default function PedidosPage()
 
                 {/* Se filtra la búsqueda de los pedidos según el ID del cliente */}
                 <label> ID cliente: 
-                    <input type = "text" value = {filtroClienteID} 
-                    onChange = {e => setFiltroClienteID(e.target.value)} placeholder = "ej. C1" size = "6"/>
+                    <input type = "numeric" value = {filtroClienteID} 
+                    onChange = {e => setFiltroClienteID(e.target.value)} placeholder = "ej. 1" size = "6"/>
                 </label>
 
                  {/* Se filtra la búsqueda de los pedidos según el ID del repartidor */}
                 <label> ID repartidor: 
-                    <input type = "text" value = {filtroRepartidorID} 
-                    onChange = {e => setFiltroRepartidorID(e.target.value)} placeholder = "ej. R1" size = "6"/>
+                    <input type = "numeric" value = {filtroRepartidorID} 
+                    onChange = {e => setFiltroRepartidorID(e.target.value)} placeholder = "ej. 1" size = "6"/>
                 </label>
 
                 {/* Se filtra la búsqueda de los pedidos según el ID del mismo */}
                 <label> ID pedido: 
-                    <input type = "text" value = {filtroPedidoID} 
-                    onChange = {e => setFiltroPedidoID(e.target.value)} placeholder = "ej. R1" size = "6"/>
+                    <input type = "numeric" value = {filtroPedidoID} 
+                    onChange = {e => setFiltroPedidoID(e.target.value)} placeholder = "ej. 1" size = "6"/>
                 </label>
 
 
