@@ -1,0 +1,130 @@
+.trackerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+}
+
+.trackerContainer.active {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.statusIcon {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--border);
+  border-radius: 50%;
+}
+
+.pulse {
+  width: 12px;
+  height: 12px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  position: relative;
+}
+
+.pulse::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  background-color: var(--accent-bg);
+  border-radius: 50%;
+  animation: ripple 1.5s infinite ease-out;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.coords {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  font-family: var(--mono);
+  color: var(--text-h);
+  background: var(--code-bg);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  .error { color: #ef4444; }
+}
+
+.actionBtn {
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+}
+
+.actionBtn.start {
+  background: var(--accent);
+  color: #fff; /* Assuming white text looks good on the accent color */
+}
+@media (prefers-color-scheme: dark) {
+  .actionBtn.start { color: #000; }
+}
+
+.actionBtn.start:hover {
+  filter: brightness(1.1);
+}
+
+.actionBtn.stop {
+  background: transparent;
+  color: var(--text-h);
+  border-color: var(--border);
+}
+
+.actionBtn.stop:hover {
+  background: var(--border);
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}

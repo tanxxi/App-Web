@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { ROLES_ARRAY } from '../constants/roles'
+import { useAuth } from '../../../context/AuthContext';
+import { ROLES_ARRAY } from '../../../constants/roles';
 
 export function PrivateRoute({ allowedRoles }) {
   const { isAuthenticated, user } = useAuth();
@@ -13,6 +13,7 @@ export function PrivateRoute({ allowedRoles }) {
 
   // Si se requiere un rol específico y el usuario no lo tiene
   if (allowedRoles && !allowedRoles.includes(user?.rol)) {
+
     return <Navigate to="/no-autorizado" replace />;
   }
 
