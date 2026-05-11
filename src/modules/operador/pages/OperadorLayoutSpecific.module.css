@@ -1,58 +1,132 @@
-/* OperadorLayout.module.css */
-
 .layout {
   display: flex;
   min-height: 100vh;
+  background-color: var(--bg-color);
 }
 
-/* ─── Barra lateral ─── */
+/* ─── Sidebar ─── */
 .sidebar {
   width: 260px;
-  background: #1a237e;
-  color: white;
-  padding: 2rem 1.5rem;
+  background-color: var(--surface-color);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 1px solid var(--border-color);
+  z-index: 20;
 }
 
-.brand {
+.logo {
+  padding: 1.5rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 2.5rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
 }
 
-.brand span {
-  font-size: 1.8rem;
+.logo h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
-/* ─── Botón de cerrar sesión ─── */
-.logoutBtn {
+/* ─── Nav ─── */
+.nav {
+  flex: 1;
+  padding: 1.5rem 0.75rem;
+  overflow-y: auto;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.navBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  color: var(--text-secondary);
   background: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  color: rgb(231, 219, 219);               /* texto negro en reposo */
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  text-align: left;
   cursor: pointer;
-  transition: all 0.25s;
-  margin-top: 1rem;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.navBtn:hover {
+  background-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.navBtn.active {
+  background-color: var(--border-light);
+  color: var(--text-primary);
+  font-weight: 600;
+  border-left: 3px solid var(--primary-color);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding-left: calc(1rem - 3px);
+}
+
+.icon {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.navBtn.active .icon {
+  opacity: 1;
+}
+
+/* ─── Footer / Logout ─── */
+.footer {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 0.65rem;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .logoutBtn:hover {
-  background: #e53935;        /* rojo intenso al pasar el cursor */
-  border-color: #e53935;
-  color: white;               /* texto blanco para contrastar con el rojo */
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #ef4444;
 }
 
-/* ─── Contenido principal ─── */
+/* ─── Main content ─── */
 .main {
   flex: 1;
+  margin-left: 260px;
   padding: 2.5rem;
-  background: #f5f6fa;
-  display: flex;
-  justify-content: center;    /* centra horizontalmente el contenido */
-  align-items: flex-start;
+  background-color: var(--bg-color);
+  overflow-y: auto;
 }
