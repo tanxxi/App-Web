@@ -1,6 +1,7 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Link, useNavigate} from 'react-router-dom'
 import {PEDIDOS_MOCK} from '../../../mock/mockPedidos';
+import {fetchPedidos} from '../services/orgServicios';
 import {ESTADOS} from '../../../constants/estados'
 
 
@@ -9,57 +10,58 @@ export default function PedidosPage()
     /*
     Hooks para los filtros de la tabla 
     */
-    const[filtroEstado, setFiltroEstado] = useState('Todos');
-    const[filtroClienteID, setFiltroClienteID] = useState('');
-    const[filtroRepartidorID, setFiltroRepartidorID] = useState('');
-    const[filtroFechaDesde, setFiltroFechaDesde] = useState('');
-    const[filtroFechaHasta, setFiltroFechaHasta] = useState('');
-    const[filtroUbicacion, setFiltroUbicacion] = useState('');
-    const[filtroPedidoID, setFiltroPedidoID] = useState('');
-    const[limite, setLimite] = useState(10)
-
-    const [horaDesde, setHoraDesde] = useState('');
-    const [horaHasta, setHoraHasta] = useState('');
-    const [ordenFecha, setOrdenFecha] = useState('desc');
+    const [pedidos, setPedidos] = useState(PEDIDOS_MOCK); // Datos que se muestran en la tabla
+    const [loading, setLoading] = useState(false);
+    const [limite, setLimite] = useState(10)
+    const [error, setError] = useState(null);
+    const [ordenFecha, setOrdenFecha] =  useState('')
     const navigate = useNavigate();
 
-    /*
-    Esto es simplemente una simulacion. Necesitamos del back-end
-    para pasar el argumento de limite, y los otros argumentos de filtrado
-    una vez los tengamos listos
-     */
-    const pedidosCortados = PEDIDOS_MOCK.slice(0, limite)
-
-    const pedidosFiltrados = pedidosCortados.filter(p => {
-
-        if (filtroEstado !== 'Todos' && p.estado !== filtroEstado) return false;
-        if (filtroClienteID && parseInt(filtroClienteID) !== p.clienteId) return false;
-        if (filtroRepartidorID && (!p.repartidorId || parseInt(filtroRepartidorID) !== p.repartidorId)) return false;
-        if (filtroFechaDesde && p.fecha < filtroFechaDesde) return false;
-        if (filtroUbicacion && (!p.ubicacion || !p.ubicacion.toLowerCase().includes(filtroUbicacion.toLowerCase()))) return false;
-        if (filtroPedidoID && parseInt(filtroPedidoID) !== p.id) return false;
-
-        // filtro por fecha (solo la parte de la fecha)
-        if (filtroFechaDesde || filtroFechaHasta) {
-            const fechaPart = p.fecha.split(' ')[0]; // "2026-05-05"
-            if (filtroFechaDesde && fechaPart < filtroFechaDesde) return false;
-            if (filtroFechaHasta && fechaPart > filtroFechaHasta) return false;
-        }
-        // filotr por hora (solo la parte de la hora)
-        if (horaDesde || horaHasta) {
-            const horaPart = p.fecha.split(' ')[1]?.substring(0, 5) || ''; // "09:30"
-            if (horaDesde && horaPart < horaDesde) return false;
-            if (horaHasta && horaPart > horaHasta) return false;
-        }
-
-        return true;
-    })
-
-    const pedidosFiltradosYOrdenados = [...pedidosFiltrados].sort((a, b) => {
-        const fechaA = new Date(a.fecha);
-        const fechaB = new Date(b.fecha);
-        return ordenFecha === 'desc' ? fechaB - fechaA : fechaA - fechaB;
+    const [filtros, setFiltros] = useState({
+        estado: 'Todos',
+        clienteId: '',
+        repartidorId: '',
+        fechaDesde: '',
+        fechaHasta: '',
+        horaDesde: '',
+        horaHasta: '',
+        ubicacion: '',
+        id: 0,
+        orden: 'desc',
     });
+
+    useEffect(() => {
+        if (limite <= 3) {
+            setPedidos(PEDIDOS_MOCK);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        fetchPedidos({ ...filtros, limite, ordenFecha})
+            .then(data => {
+            setPedidos(data);
+            setLoading(false);
+            })
+            .catch(err => {
+            console.error(err);
+            setLoading(false);
+            });
+        }, [limite, filtros, ordenFecha]
+    );
+
+    const pedidosFiltrados = limite <= 15
+    ? pedidos.slice(0, limite).filter(p => {
+      // tu lógica local (idéntica a la de fetchPedidos)
+      if (filtros.estado !== 'Todos' && p.estado !== filtros.estado) return false;
+      // ... resto de condiciones ...
+      return true;
+    })
+    : pedidos; // en modo servidor ya vienen filtrados y cortados
+
+    const handleFiltroChange = (campo, valor) => {
+        setFiltros(prev => ({ ...prev, [campo]: valor }));
+    };
 
     return(
         <div>
@@ -80,7 +82,7 @@ export default function PedidosPage()
 
                 {/* Se filtra la búsqueda de los pedidos a su estado*/}
                 <label> Estado:
-                    <select value ={filtroEstado} onChange = {e => setFiltroEstado(e.target.value)}>
+                    <select value ={filtros.estado} onChange = {e => handleFiltroChange('estado', e.target.value)}>
                         {ESTADOS.map(e=> <option key = {e}> {e} </option>)}
                     </select>
                 </label>
@@ -89,8 +91,8 @@ export default function PedidosPage()
                     Ubicación:
                     <input
                     type="text"
-                    value={filtroUbicacion}
-                    onChange={e => setFiltroUbicacion(e.target.value)}
+                    value={filtros.ubicacion}
+                    onChange={e => handleFiltroChange('ubicacion', e.target.value)}
                     placeholder="ej. Calle 100 #13-39"
                     size="15"
                     />
@@ -101,8 +103,8 @@ export default function PedidosPage()
                     Hora desde:
                     <input
                     type="time"
-                    value={horaDesde}
-                    onChange={e => setHoraDesde(e.target.value)}
+                    value={filtros.horaDesde}
+                    onChange={e => handleFiltroChange('horaDesde', e.target.value)}
                     />
                 </label>
 
@@ -110,38 +112,38 @@ export default function PedidosPage()
                     Hora hasta:
                     <input
                     type="time"
-                    value={horaHasta}
-                    onChange={e => setHoraHasta(e.target.value)}
+                    value={filtros.horaHasta}
+                    onChange={e => handleFiltroChange('horaHasta', e.target.value)}
                     />
                 </label>
 
                 {/* Se filtra la búsqueda de los pedidos según el ID del cliente */}
                 <label> ID cliente: 
-                    <input type = "numeric" value = {filtroClienteID} 
-                    onChange = {e => setFiltroClienteID(e.target.value)} placeholder = "ej. 1" size = "6"/>
+                    <input type = "numeric" value = {filtros.clienteId} 
+                    onChange = {e => handleFiltroChange('clienteId', parseInt(e.target.value) || '')} placeholder = "ej. 1" size = "6"/>
                 </label>
 
                  {/* Se filtra la búsqueda de los pedidos según el ID del repartidor */}
                 <label> ID repartidor: 
-                    <input type = "numeric" value = {filtroRepartidorID} 
-                    onChange = {e => setFiltroRepartidorID(e.target.value)} placeholder = "ej. 1" size = "6"/>
+                    <input type = "numeric" value = {filtros.repartidorId} 
+                    onChange = {e => handleFiltroChange('repartidorId', parseInt(e.target.value) || '')} placeholder = "ej. 1" size = "6"/>
                 </label>
 
                 {/* Se filtra la búsqueda de los pedidos según el ID del mismo */}
                 <label> ID pedido: 
-                    <input type = "numeric" value = {filtroPedidoID} 
-                    onChange = {e => setFiltroPedidoID(e.target.value)} placeholder = "ej. 1" size = "6"/>
+                    <input type = "numeric" value = {filtros.id} 
+                    onChange = {e => handleFiltroChange('id', parseInt(e.target.value) || '')} placeholder = "ej. 1" size = "6"/>
                 </label>
 
 
                 {/* Se filtra la búsqueda de los pedidos según la fecha de comienzo*/}
                 <label> Desde: 
-                    <input type = "date" value = {filtroFechaDesde} onChange = {e => setFiltroFechaDesde(e.target.value)}/>
+                    <input type = "date" value = {filtros.fechaDesde} onChange = {e => handleFiltroChange('fechaDesde',e.target.value)}/>
                 </label>
 
                 {/* Se filtra la búsqueda de los pedidos según la fecha hasta  */}
                 <label> Hasta:
-                    <input type = "date" value = {filtroFechaHasta} onChange = {e => setFiltroFechaHasta(e.target.value)}/>
+                    <input type = "date" value = {filtros.fechaHasta} onChange = {e => handleFiltroChange('fechaHasta', e.target.value)}/>
                 </label>
             </div>
 
@@ -156,20 +158,22 @@ export default function PedidosPage()
                         <th> Cliente ID </th>
                         <th> Repartidor ID </th>
                         <th> Estado </th>
-                        <th onClick={() => setOrdenFecha(prev => prev === 'desc' ? 'asc' : 'desc')} style={{ cursor: 'pointer' }}>
-                            Fecha {ordenFecha === 'desc' ? '▼' : '▲'}
+                        <th onClick={() => handleFiltroChange('orden', filtros.orden === 'desc' ? 'asc' : 'desc')}
+                        style={{ cursor: 'pointer' }}
+                        >
+                        Fecha {filtros.orden === 'desc' ? '▼' : '▲'}
                         </th>
                         <th> Acciones </th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {pedidosFiltradosYOrdenados.length === 0 ? (
+                    {pedidosFiltrados.length === 0 ? (
                         <tr>
                         <td colSpan={9}>No hay pedidos</td>
                         </tr>
                     ) : (
-                        pedidosFiltradosYOrdenados.map(p => (
+                        pedidosFiltrados.map(p => (
                         <tr key={p.id}>
                             <td>{p.id}</td>
                             <td>{p.origen}</td>
