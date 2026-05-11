@@ -1,6 +1,9 @@
 import {createContext, useContext, useState} from 'react'
 import { ROLES } from '../constants/roles';
+import { mockUsuarios } from '../mock/mockUsuarios'; // Instruccion de importacion de usuarios desde el mockUsusarios de forma directa
 
+
+import { authenticateUser } from '../mock/credentialsMock';
 
 const AuthContext = createContext(null)
 
@@ -10,19 +13,10 @@ export function AuthProvider({children})
     const [token, setToken] = useState(null)
 
     const login = async (email, password) => {
-        
-        const MockResponse = {
-            token: "123456",
-            user: {
-                id: 1,
-                nombre: "Pepito Perez",
-                rol: ROLES.OPERADOR_LOGISTICO
-            }
-        }
-
-        setUser(MockResponse.user)
-        setToken(MockResponse.token)
-        console.log('AuthContext: estado actualizado', MockResponse.user);
+        const response = await authenticateUser(email, password);
+        setUser(response.user)
+        setToken(response.token)
+        console.log('AuthContext: estado actualizado', response.user);
     }
 
     const logout = () => {
@@ -33,7 +27,7 @@ export function AuthProvider({children})
     const value = {
         user,
         token,
-        isAuthenticated: !!token, 
+        isAuthenticated: !!token, // se genera autenticacion del sistema
         login,
         logout
     }
