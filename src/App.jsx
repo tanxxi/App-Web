@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import LoginPage from './pages/LoginPage';
 import { ROLES } from './constants/roles';
+import ClienteRoutes from './modules/cliente/routes/ClienteRoutes';
 // Layouts y páginas futuras (por ahora no importados)
 // import OperadorLayout from './pages/operador/OperadorLayout';
 
@@ -45,10 +46,8 @@ function App() {
         <Route path="/repartidor" element={<div>Panel del Repartidor (próximamente)</div>} />
       </Route>
 
-      {/* Rutas protegidas para cliente */}
-      <Route element={<PrivateRoute allowedRoles={[ROLES.CLIENTE]} />}>
-        <Route path="/cliente" element={<div>Panel del Cliente (próximamente)</div>} />
-      </Route>
+      {/* Modulo Cliente */}
+      <ClienteRoutes/>
 
       {/* No autorizado */}
       <Route path="/no-autorizado" element={<div>No tienes permiso para acceder a esta sección.</div>} />
