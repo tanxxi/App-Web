@@ -4,7 +4,7 @@ export const MOCK_CREDENTIALS = [
   {
     id: 1,
     email: 'admin@test.com',
-    password: 'password123',
+    password: 'pass123',
     nombre: 'Admin General',
     rol: ROLES.ADMINISTRADOR,
     token: 'token-admin-123456'

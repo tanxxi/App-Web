@@ -23,7 +23,7 @@ function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError('Usuario o contraseña incorrectos.');
+      setError(err.message || 'Usuario o contraseña incorrectos.');
     } finally {
       setLoading(false);
     }
@@ -39,16 +39,6 @@ function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.demoCredentials}>
-            <h4>Credenciales Demo:</h4>
-            <ul>
-              {MOCK_CREDENTIALS.map(cred => (
-                <li key={cred.id} onClick={() => { setEmail(cred.email); setPassword(cred.password); }} style={{ cursor: 'pointer' }}>
-                  <strong>{cred.rol}:</strong> {cred.email} / {cred.password}
-                </li>
-              ))}
-            </ul>
-          </div>
           {error && (
             <div className={styles.errorBox}>
               <span>⚠️ {error}</span>
