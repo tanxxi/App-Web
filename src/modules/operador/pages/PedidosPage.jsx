@@ -1,198 +1,271 @@
-import {useState, useEffect} from 'react';
-import {Link, useNavigate} from 'react-router-dom'
-import {PEDIDOS_MOCK} from '../../../mock/mockPedidos';
-import {fetchPedidos} from '../services/orgServicios';
-import {ESTADOS} from '../../../constants/estados'
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchPedidos } from '../services/orgServicios';
+import { ESTADOS } from '../../../constants/estados';
 
+export default function PedidosPage() {
 
-export default function PedidosPage()
-{   
-    /*
-    Hooks para los filtros de la tabla 
-    */
-    const [pedidos, setPedidos] = useState(PEDIDOS_MOCK); // Datos que se muestran en la tabla
-    const [loading, setLoading] = useState(false);
-    const [limite, setLimite] = useState(10)
-    const [error, setError] = useState(null);
-    const [ordenFecha, setOrdenFecha] =  useState('')
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const token = sessionStorage.getItem('token'); // o como manejes el token
 
-    const [filtros, setFiltros] = useState({
-        estado: 'Todos',
-        clienteId: '',
-        repartidorId: '',
-        fechaDesde: '',
-        fechaHasta: '',
-        horaDesde: '',
-        horaHasta: '',
-        ubicacion: '',
-        id: 0,
-        orden: 'desc',
-    });
+  console.log(token);
 
-    useEffect(() => {
-        if (limite <= 3) {
-            setPedidos(PEDIDOS_MOCK);
-            setLoading(false);
-            return;
-        }
+  // Estados
+  const [pedidos, setPedidos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
-        setLoading(true);
-        fetchPedidos({ ...filtros, limite, ordenFecha})
-            .then(data => {
-            setPedidos(data);
-            setLoading(false);
-            })
-            .catch(err => {
-            console.error(err);
-            setLoading(false);
-            });
-        }, [limite, filtros, ordenFecha]
-    );
+  const [filtros, setFiltros] = useState({
+    estado: 'Todos',
+    clienteId: '',
+    repartidorId: '',
+    fechaDesde: '',
+    fechaHasta: '',
+    horaDesde: '',
+    horaHasta: '',
+    ubicacion: '',
+    id: 0,
+    limite: 10,
+    ordenFecha: 'desc',
+  });
 
-    const pedidosFiltrados = limite <= 15
-    ? pedidos.slice(0, limite).filter(p => {
-      // tu lógica local (idéntica a la de fetchPedidos)
-      if (filtros.estado !== 'Todos' && p.estado !== filtros.estado) return false;
-      // ... resto de condiciones ...
-      return true;
-    })
-    : pedidos; // en modo servidor ya vienen filtrados y cortados
+  // Cargar pedidos cuando cambien filtros, página o límite
+  useEffect(() => {
+    if (!token) return;
 
-    const handleFiltroChange = (campo, valor) => {
-        setFiltros(prev => ({ ...prev, [campo]: valor }));
+    setLoading(true);
+    setError(null);
+
+    // Preparar objeto con los filtros que no estén vacíos
+    const params = {
+      ...filtros,
+      page,
     };
+    // Eliminar campos vacíos o 'Todos' para no enviarlos
+    if (params.estado === 'Todos') delete params.estado;
+    if (!params.clienteId) delete params.clienteId;
+    if (!params.repartidorId) delete params.repartidorId;
+    if (!params.id) delete params.id;
+    if (!params.ubicacion) delete params.ubicacion;
+    if (!params.fechaDesde) delete params.fechaDesde;
+    if (!params.fechaHasta) delete params.fechaHasta;
+    if (!params.horaDesde) delete params.horaDesde;
+    if (!params.horaHasta) delete params.horaHasta;
 
-    return(
-        <div >
-            <h1> Gestión de Pedidos </h1>
-            <div>
+    fetchPedidos(params, token)
+      .then(data => {
+        setPedidos(data.content);
+        setTotalPages(data.totalPages);
+        setTotalElements(data.totalElements);
+        // Si la página actual es mayor que totalPages-1, resetear
+        if (data.totalPages > 0 && page >= data.totalPages) {
+          setPage(data.totalPages - 1);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [filtros, page, token]); // cuando cambie page o filtros, recarga
 
-                {/* Limite de instancias presentadas*/}
-                <label>
-                    Limite:
-                    <input
-                     type = "number"
-                     value = {limite}
-                     min = "1"
-                     max = "200"
-                     onChange = {e => setLimite(parseInt(e.target.value, 10) || 10)}
-                    />
-                </label>
+  // Manejadores de filtros
+  const handleFiltroChange = (campo, valor) => {
+    setFiltros(prev => ({ ...prev, [campo]: valor }));
+    setPage(0); // reiniciar página al cambiar filtros
+  };
 
-                {/* Se filtra la búsqueda de los pedidos a su estado*/}
-                <label> Estado:
-                    <select value ={filtros.estado} onChange = {e => handleFiltroChange('estado', e.target.value)}>
-                        {ESTADOS.map(e=> <option key = {e}> {e} </option>)}
-                    </select>
-                </label>
+  // Cambiar orden (asc/desc) al hacer clic en la columna Fecha
+  const toggleOrden = () => {
+    const nuevoOrden = filtros.ordenFecha === 'desc' ? 'asc' : 'desc';
+    handleFiltroChange('ordenFecha', nuevoOrden);
+  };
 
-                <label>
-                    Ubicación:
-                    <input
-                    type="text"
-                    value={filtros.ubicacion}
-                    onChange={e => handleFiltroChange('ubicacion', e.target.value)}
-                    placeholder="ej. Calle 100 #13-39"
-                    size="15"
-                    />
-                </label>
+  // Limpiar filtros (opcional)
+  const limpiarFiltros = () => {
+    setFiltros({
+      estado: 'Todos',
+      clienteId: '',
+      repartidorId: '',
+      fechaDesde: '',
+      fechaHasta: '',
+      horaDesde: '',
+      horaHasta: '',
+      ubicacion: '',
+      id: 0,
+      limite: 10,
+      ordenFecha: 'desc',
+    });
+    setPage(0);
+  };
 
-                {/*Se filtra por hora*/}
-                <label>
-                    Hora desde:
-                    <input
-                    type="time"
-                    value={filtros.horaDesde}
-                    onChange={e => handleFiltroChange('horaDesde', e.target.value)}
-                    />
-                </label>
+  // Si hay error, mostrar mensaje
+  if (error) return <div>Error: {error}</div>;
 
-                <label>
-                    Hora hasta:
-                    <input
-                    type="time"
-                    value={filtros.horaHasta}
-                    onChange={e => handleFiltroChange('horaHasta', e.target.value)}
-                    />
-                </label>
+  return (
+    <div>
+      <h1>Gestión de Pedidos</h1>
+      <div>
+        {/* Límite */}
+        <label>
+          Límite:
+          <input
+            type="number"
+            value={filtros.limite}
+            min="1"
+            max="200"
+            onChange={e => handleFiltroChange('limite', parseInt(e.target.value, 10) || 10)}
+          />
+        </label>
 
-                {/* Se filtra la búsqueda de los pedidos según el ID del cliente */}
-                <label> ID cliente: 
-                    <input type = "numeric" value = {filtros.clienteId} 
-                    onChange = {e => handleFiltroChange('clienteId', parseInt(e.target.value) || '')} placeholder = "ej. 1" size = "6"/>
-                </label>
+        {/* Filtro de estado */}
+        <label>
+          Estado:
+          <select value={filtros.estado} onChange={e => handleFiltroChange('estado', e.target.value)}>
+            {ESTADOS.map(e => <option key={e}>{e}</option>)}
+          </select>
+        </label>
 
-                 {/* Se filtra la búsqueda de los pedidos según el ID del repartidor */}
-                <label> ID repartidor: 
-                    <input type = "numeric" value = {filtros.repartidorId} 
-                    onChange = {e => handleFiltroChange('repartidorId', parseInt(e.target.value) || '')} placeholder = "ej. 1" size = "6"/>
-                </label>
+        <label>
+          Ubicación:
+          <input
+            type="text"
+            value={filtros.ubicacion}
+            onChange={e => handleFiltroChange('ubicacion', e.target.value)}
+            placeholder="ej. Calle 100 #13-39"
+            size="15"
+          />
+        </label>
 
-                {/* Se filtra la búsqueda de los pedidos según el ID del mismo */}
-                <label> ID pedido: 
-                    <input type = "numeric" value = {filtros.id} 
-                    onChange = {e => handleFiltroChange('id', parseInt(e.target.value) || '')} placeholder = "ej. 1" size = "6"/>
-                </label>
+        <label>
+          Hora desde:
+          <input
+            type="time"
+            value={filtros.horaDesde}
+            onChange={e => handleFiltroChange('horaDesde', e.target.value)}
+          />
+        </label>
 
+        <label>
+          Hora hasta:
+          <input
+            type="time"
+            value={filtros.horaHasta}
+            onChange={e => handleFiltroChange('horaHasta', e.target.value)}
+          />
+        </label>
 
-                {/* Se filtra la búsqueda de los pedidos según la fecha de comienzo*/}
-                <label> Desde: 
-                    <input type = "date" value = {filtros.fechaDesde} onChange = {e => handleFiltroChange('fechaDesde',e.target.value)}/>
-                </label>
+        <label>
+          ID cliente:
+          <input
+            type="number"
+            value={filtros.clienteId}
+            onChange={e => handleFiltroChange('clienteId', parseInt(e.target.value) || '')}
+            placeholder="ej. 1"
+            size="6"
+          />
+        </label>
 
-                {/* Se filtra la búsqueda de los pedidos según la fecha hasta  */}
-                <label> Hasta:
-                    <input type = "date" value = {filtros.fechaHasta} onChange = {e => handleFiltroChange('fechaHasta', e.target.value)}/>
-                </label>
-            </div>
+        <label>
+          ID repartidor:
+          <input
+            type="number"
+            value={filtros.repartidorId}
+            onChange={e => handleFiltroChange('repartidorId', parseInt(e.target.value) || '')}
+            placeholder="ej. 1"
+            size="6"
+          />
+        </label>
 
+        <label>
+          ID pedido:
+          <input
+            type="number"
+            value={filtros.id}
+            onChange={e => handleFiltroChange('id', parseInt(e.target.value) || '')}
+            placeholder="ej. 1"
+            size="6"
+          />
+        </label>
 
-            <table border = "1">
-                <thead>
-                    <tr>
-                        <th> ID </th>
-                        <th> Origen </th>
-                        <th> Destino </th>
-                        <th> Ubicación </th>
-                        <th> Cliente ID </th>
-                        <th> Repartidor ID </th>
-                        <th> Estado </th>
-                        <th onClick={() => handleFiltroChange('orden', filtros.orden === 'desc' ? 'asc' : 'desc')}
-                        style={{ cursor: 'pointer' }}
-                        >
-                        Fecha {filtros.orden === 'desc' ? '▼' : '▲'}
-                        </th>
-                        <th> Acciones </th>
-                    </tr>
-                </thead>
+        <label>
+          Desde:
+          <input
+            type="date"
+            value={filtros.fechaDesde}
+            onChange={e => handleFiltroChange('fechaDesde', e.target.value)}
+          />
+        </label>
 
-                <tbody>
-                    {pedidosFiltrados.length === 0 ? (
-                        <tr>
-                        <td colSpan={9}>No hay pedidos</td>
-                        </tr>
-                    ) : (
-                        pedidosFiltrados.map(p => (
-                        <tr key={p.id}>
-                            <td>{p.id}</td>
-                            <td>{p.origen}</td>
-                            <td>{p.destino}</td>
-                            <td>{p.ubicacion}</td>
-                            <td>{p.clienteId}</td>
-                            <td>{p.repartidorId || '-'}</td>
-                            <td>{p.estado}</td>
-                            <td>{p.fecha}</td>
-                            <td>
-                            <button onClick={() => navigate(`/operador/pedidos/${p.id}`)}>Detalle</button>
-                            <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}>Editar</button>
-                            </td>
-                        </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-            <button onClick = {() =>  navigate('/operador/pedidos/nuevo')}> + Nuevo Pedido </button>
-        </div>
-    )
+        <label>
+          Hasta:
+          <input
+            type="date"
+            value={filtros.fechaHasta}
+            onChange={e => handleFiltroChange('fechaHasta', e.target.value)}
+          />
+        </label>
+
+        <button onClick={limpiarFiltros}>Limpiar filtros</button>
+      </div>
+
+      {loading && <p>Cargando...</p>}
+
+      <table border="1">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Ubicación</th>
+            <th>Cliente ID</th>
+            <th>Repartidor ID</th>
+            <th>Estado</th>
+            <th onClick={toggleOrden} style={{ cursor: 'pointer' }}>
+              Fecha {filtros.ordenFecha === 'desc' ? '▼' : '▲'}
+            </th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pedidos.length === 0 ? (
+            <tr>
+              <td colSpan="9">No hay pedidos</td>
+            </tr>
+          ) : (
+            pedidos.map(p => (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.origen}</td>
+                <td>{p.destino}</td>
+                <td>{p.ubicacion || '-'}</td>
+                <td>{p.clienteId}</td>
+                <td>{p.repartidorId || '-'}</td>
+                <td>{p.estado}</td>
+                <td>{p.fecha}</td>
+                <td>
+                  <button onClick={() => navigate(`/operador/pedidos/${p.id}`)}>Detalle</button>
+                  <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}>Editar</button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      {/* Controles de paginación */}
+      <div>
+        <button disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</button>
+        <span> Página {page + 1} de {totalPages} </span>
+        <button disabled={page + 1 >= totalPages} onClick={() => setPage(p => p + 1)}>Siguiente</button>
+      </div>
+      <div>Total de pedidos: {totalElements}</div>
+
+      <button onClick={() => navigate('/operador/pedidos/nuevo')}>+ Nuevo Pedido</button>
+    </div>
+  );
 }
