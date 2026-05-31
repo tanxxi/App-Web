@@ -1,72 +1,85 @@
-import {PEDIDOS_MOCK} from '../../../mock/mockPedidos';
+const API = 'http://localhost:8080'
 
-export async function fetchPedidos(params) {
-  const { estado, 
-    clienteId, 
-    repartidorId, 
-    fechaDesde, fechaHasta, 
-    horaDesde, horaHasta, 
-    ubicacion, id, 
-    limite, orden = 'desc'} = params;
+//Para conseguir los pedidos en la tabla dinámica del org logistico 
+//de acuerdo a los filtros establecidos. 
+export const fetchPedidos = async (filtros, token) => {
   
-  //Aquí debe estar claro que es el primer parametro que el backend necesita para devolver una 
-  //cantidad específica de instancias. Alteraciones con GET deben ser implementadas cuando 
-  //haya un back-end
+  const params = new URLSearchParams();
 
-  let resultado = [... PEDIDOS_MOCK]
+  // Paginación y orden
 
-  if (limite !== undefined && limite !== null) {
-    resultado = resultado.slice(0, limite);
+  params.append('page', String(filtros.page ?? 0));
+  params.append('size', String(filtros.limite ?? 10));
+  if (filtros.ordenFecha) {
+    params.append('sort', `fechaCreacion,${filtros.ordenFecha}`); // ej. fecha,desc
+  } else {
+    params.append('sort', 'fechaCreacion,desc');
   }
 
-  if (estado && estado !== 'Todos') {
-    resultado = resultado.filter(p => p.estado === estado);
-  }
+  // Filtros
+  if (filtros.estado && filtros.estado !== 'Todos') params.append('estado', filtros.estado);
+  if (filtros.clienteId) params.append('clienteId', filtros.clienteId);
+  if (filtros.repartidorId) params.append('repartidorId', filtros.repartidorId);
+  if (filtros.id) params.append('id', filtros.id);
+  if (filtros.ubicacion) params.append('ubicacion', filtros.ubicacion);
+  if (filtros.fechaDesde) params.append('fechaDesde', filtros.fechaDesde);
+  if (filtros.fechaHasta) params.append('fechaHasta', filtros.fechaHasta);
+  if (filtros.horaDesde) params.append('horaDesde', filtros.horaDesde);
+  if (filtros.horaHasta) params.append('horaHasta', filtros.horaHasta);
 
-  if (ubicacion) {
-    resultado = resultado.filter(p =>
-      p.ubicacion && p.ubicacion.toLowerCase().includes(ubicacion.toLowerCase())
-    );
-  }
+  console.log(`${API}/api/pedidos?${params.toString()}`);
 
-  if (clienteId){
-    resultado = resultado.filter(p => p.clienteId === clienteId);
-  }
-
-  if (repartidorId){
-    resultado = resultado.filter(p => p.repartidorId && p.repartidorId === repartidorId);
-  }
-
-  if (id) {
-    resultado = resultado.filter(p => p.id === id);
-  }
-
-
-  if (fechaDesde || fechaHasta){
-    resultado = resultado.filter(p => {
-      const fechaPart = p.fecha.split(' ')[0];   // "2026-05-05"
-      if (fechaDesde && fechaPart < fechaDesde) return false;
-      if (fechaHasta && fechaPart > fechaHasta) return false;
-      return true;
-    });
-
-  }
-
-  if (horaDesde || horaHasta) {
-    resultado = resultado.filter(p => {
-      const horaPart = p.fecha.split(' ')[1]?.substring(0, 5) || ''; // "09:30"
-      if (horaDesde && horaPart < horaDesde) return false;
-      if (horaHasta && horaPart > horaHasta) return false;
-      return true;
-    });
-  }
-
-  resultado.sort((a, b) => {
-    const diff = new Date(b.fecha) - new Date(a.fecha);
-    return orden === 'asc' ? -diff : diff;
+  const response = await fetch(`${API}/api/pedidos?${params.toString()}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
   });
 
-  return resultado; 
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Error al cargar pedidos');
+  }
+
+  const data = await response.json();
+  // data tiene la estructura: { content, totalPages, totalElements, number, size, ... }
+  return data;
+};
+
+
+export const crearPedido = async (datosPedido, token) => {
+  const response = await fetch(`${API}/api/pedidos/logistico`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datosPedido),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Error al crear el pedido');
+  }
+
+  return await response.json(); // Retorna el PedidoResponseDTO
+};
+
+export const obtenerPedido = async(id, token) =>
+{
+  const response = await fetch(`${API}/api/pedidos/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-type': 'application/json',
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Error al crear el pedido');
+  }
+
+  return await response.json();
 }
 
 // orgServicios.js (añade esto después de fetchPedidos)

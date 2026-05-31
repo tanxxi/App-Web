@@ -6,9 +6,7 @@ import { ESTADOS } from '../../../constants/estados';
 export default function PedidosPage() {
 
   const navigate = useNavigate();
-  const token = sessionStorage.getItem('token'); // o como manejes el token
-
-  console.log(token);
+  const token = localStorage.getItem('token'); // o como manejes el token
 
   // Estados
   const [pedidos, setPedidos] = useState([]);
@@ -246,7 +244,7 @@ export default function PedidosPage() {
                 <td>{p.clienteId}</td>
                 <td>{p.repartidorId || '-'}</td>
                 <td>{p.estado}</td>
-                <td>{p.fecha}</td>
+                <td>{p.fechaCreacion}</td>
                 <td>
                   <button onClick={() => navigate(`/operador/pedidos/${p.id}`)}>Detalle</button>
                   <button onClick={() => navigate(`/operador/pedidos/${p.id}/editar`)}>Editar</button>

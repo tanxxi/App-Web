@@ -1,1 +1,1 @@
-export const ESTADOS = ['Todos', 'Pendiente', 'Asignado', 'En tránsito', 'Entregado', 'Cancelado']
+export const ESTADOS = ['Todos', 'PENDIENTE', 'ASIGNADO', 'EN_TRANSITO', 'ENTREGADO', 'CANCELADO']
