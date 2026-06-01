@@ -19,6 +19,38 @@
   margin: 0;
 }
 
+.errorBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  color: #dc2626;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.retryBtn {
+  background: none;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.retryBtn:hover {
+  background-color: #dc2626;
+  color: #fff;
+}
+
 .filters {
   display: flex;
   justify-content: space-between;
@@ -96,6 +128,13 @@
 
 .table tr:hover td {
   background-color: var(--bg-color);
+}
+
+.emptyRow {
+  text-align: center !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.9rem;
+  padding: 3rem 1rem !important;
 }
 
 .timestamp {

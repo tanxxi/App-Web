@@ -23,7 +23,7 @@ src/modules/
 
 | Rol | Ruta | Funcionalidades |
 |-----|------|-----------------|
-| **Administrador** | `/admin` | Dashboard, usuarios, roles, pedidos, repartidores, historial, configuración |
+| **Administrador** | `/admin` | Dashboard, usuarios, roles, pedidos, repartidores, historial, configuración, logs, reportes |
 | **Operador Logístico** | `/operador` | Dashboard, crear/editar pedidos, filtrar, asignar repartidores |
 | **Repartidor** | `/repartidor` | Ver pedidos asignados, cambiar estado, tracking GPS en tiempo real |
 | **Cliente** | `/cliente` | Placeholder (próximamente) |
@@ -79,9 +79,23 @@ http://localhost:8080 (Gateway)
 #### Usuarios
 - `GET /api/usuarios` — Listar usuarios (Admin, Operador)
 - `GET /api/usuarios/{id}` — Obtener usuario
+- `GET /api/usuarios/repartidores` — Listar repartidores (Admin)
 - `POST /api/usuarios` — Crear usuario (Admin)
 - `PUT /api/usuarios/{id}` — Actualizar usuario (Admin)
 - `DELETE /api/usuarios/{id}` — Eliminar usuario (Admin)
+
+#### Configuración (Admin)
+- `GET /api/config` — Obtener parámetros del sistema
+- `PUT /api/config/{id}` — Actualizar parámetro
+
+#### Logs (Admin)
+- `GET /api/logs` — Consultar logs del sistema
+
+#### Reportes (Admin)
+- `GET /api/pedidos/reportes` — Estadísticas de pedidos (totales y por estado)
+
+#### Historial (Admin)
+- `GET /api/pedidos/{pedidoId}/historial` — Historial completo de un pedido
 
 #### Pedidos (Operador + Repartidor)
 - `GET /api/pedidos?repartidorId={id}` — Pedidos del repartidor
@@ -111,6 +125,15 @@ PENDIENTE → ASIGNADO → EN_TRANSITO → ENTREGADO
 - Permiso de geolocalización del navegador
 
 ## 📝 Cambios Recientes
+
+### Rama actual (admin mock fallback)
+Agregar fallback a datos mock para todos los servicios del módulo admin:
+
+✅ **Cambios implementados:**
+- `adminService.js` ahora incluye mock fallback para todos los servicios (pedidos, usuarios, repartidores, configuración, logs, reportes, historial)
+- El fallback se activa con token mock (`token-*`) o si la API no responde
+- Permite desarrollar el módulo admin sin necesidad del backend corriendo
+- API Gateway actualizado para enrutar `/api/config/**` y `/api/logs/**` al `user-service`
 
 ### Rama: `conexion-modulo-repartidor`
 Conectar el módulo Repartidor al backend:
@@ -144,16 +167,18 @@ Para probar el módulo repartidor conectado:
 | Módulo | Estado | Conectado al Backend |
 |--------|--------|----------------------|
 | Auth | ✅ Completo | ✅ Sí |
-| Admin | ⚠️ Parcial | ⚠️ Parcial (dashboard usa mocks) |
+| Admin | ✅ Completo | ✅ Sí (con mock fallback) |
 | Operador | ✅ Completo | ✅ Sí |
 | Repartidor | ✅ Completo | ✅ Sí (rama: `conexion-modulo-repartidor`) |
 
 ## 🔄 Fallback Mechanism
 
-Si el backend no está disponible:
-- **Login:** Usa credenciales mock (credentialsMock.js)
-- **Usuarios:** Usa MOCK_CREDENTIALS como fallback
-- **Pedidos:** No tiene fallback (requiere backend real)
+Si el backend no está disponible, el frontend usa datos mock locales para no bloquear el desarrollo:
+
+- **Login:** Fallback a credenciales mock (`credentialsMock.js`)
+- **Usuarios:** Fallback a `MOCK_CREDENTIALS` en `userService.js`
+- **Admin (todos los servicios):** Fallback a datos mock en `adminService.js` (pedidos, repartidores, configuración, logs, reportes, historial)
+- El fallback se activa con token mock (`token-*`) o si la API no responde
 
 ## 🛠️ Desarrollo
 
@@ -162,13 +187,22 @@ Si el backend no está disponible:
 ```javascript
 // src/services/miServicio.js
 const API_BASE = 'http://localhost:8080';
+const isMockToken = (token) => !token || token.startsWith('token-');
+
+const MOCK_DATA = [ /* datos de prueba */ ];
 
 export const miEndpoint = async (id, token) => {
-  const res = await fetch(`${API_BASE}/api/ruta/${id}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Error');
-  return await res.json();
+  if (isMockToken(token)) return MOCK_DATA;
+  try {
+    const res = await fetch(`${API_BASE}/api/ruta/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Error');
+    return await res.json();
+  } catch {
+    console.warn('Fallback a mock.');
+    return MOCK_DATA;
+  }
 };
 ```
 

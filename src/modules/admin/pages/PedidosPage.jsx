@@ -29,11 +29,11 @@ export default function PedidosPage() {
   const estados = ['todos', 'PENDIENTE', 'ASIGNADO', 'EN_TRANSITO', 'ENTREGADO', 'CANCELADO'];
 
   const handleVerDetalle = (id) => {
-    alert(`Ver detalle del pedido #${id}`);
+    // TODO: Navigate to detail page or open modal
   };
 
   const handleEditar = (id) => {
-    alert(`Editar pedido #${id}`);
+    // TODO: Navigate to edit page or open modal
   };
 
   const filteredPedidos = pedidos.filter((p) => {

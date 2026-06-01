@@ -28,11 +28,11 @@ export default function RepartidoresPage() {
   const estados = ['todos', 'DISPONIBLE', 'OCUPADO', 'INACTIVO'];
 
   const handleVerDetalle = (id) => {
-    alert(`Ver detalle del repartidor #${id}`);
+    // TODO: Navigate to detail page or open modal
   };
 
   const handleEditar = (id) => {
-    alert(`Editar repartidor #${id}`);
+    // TODO: Navigate to edit page or open modal
   };
 
   const filteredRepartidores = repartidores.filter((r) => {

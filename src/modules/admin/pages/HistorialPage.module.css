@@ -19,6 +19,25 @@
   margin: 0;
 }
 
+.errorBox {
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  color: #dc2626;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.hintText {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
 .filters {
   display: flex;
   justify-content: space-between;
@@ -58,6 +77,27 @@
 
 .searchInput::placeholder {
   color: var(--text-tertiary);
+}
+
+.searchBtn {
+  background-color: var(--text-primary);
+  color: #fff;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.searchBtn:hover {
+  opacity: 0.85;
+}
+
+.searchBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .count {

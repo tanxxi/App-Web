@@ -18,12 +18,18 @@ export default function LogsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const cargarLogs = () => {
     if (!token) return;
+    setLoading(true);
+    setError(null);
     getLogs(token)
       .then(setLogs)
       .catch(() => setError('Error al cargar logs'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    cargarLogs();
   }, [token]);
 
   const filteredLogs = logs.filter(
@@ -49,11 +55,16 @@ export default function LogsPage() {
         <span className={styles.count}>{filteredLogs.length} entradas</span>
       </div>
 
-      {loading ? (
-        <p>Cargando logs...</p>
-      ) : error ? (
-        <p style={{ color: '#ef4444' }}>{error}</p>
-      ) : (
+      {loading && <p>Cargando logs...</p>}
+
+      {error && (
+        <div className={styles.errorBox}>
+          <span>{error}</span>
+          <button onClick={cargarLogs} className={styles.retryBtn}>Reintentar</button>
+        </div>
+      )}
+
+      {!loading && !error && (
         <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead>
@@ -65,23 +76,31 @@ export default function LogsPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.map((log) => {
-                const colors = tipoColors[log.tipo] || { bg: '#f1f5f9', color: '#64748b' };
-                return (
-                  <tr key={log.id}>
-                    <td className={styles.timestamp}>
-                      {new Date(log.timestamp).toLocaleString('es-CO')}
-                    </td>
-                    <td>
-                      <span className={styles.tipoBadge} style={{ backgroundColor: colors.bg, color: colors.color }}>
-                        {log.tipo}
-                      </span>
-                    </td>
-                    <td>{log.usuarioId || '—'}</td>
-                    <td className={styles.descripcion}>{log.descripcion}</td>
-                  </tr>
-                );
-              })}
+              {filteredLogs.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className={styles.emptyRow}>
+                    No se encontraron logs{filtroTipo !== 'todos' ? ` de tipo ${filtroTipo}` : ''}.
+                  </td>
+                </tr>
+              ) : (
+                filteredLogs.map((log) => {
+                  const colors = tipoColors[log.tipo] || { bg: '#f1f5f9', color: '#64748b' };
+                  return (
+                    <tr key={log.id}>
+                      <td className={styles.timestamp}>
+                        {new Date(log.timestamp).toLocaleString('es-CO')}
+                      </td>
+                      <td>
+                        <span className={styles.tipoBadge} style={{ backgroundColor: colors.bg, color: colors.color }}>
+                          {log.tipo}
+                        </span>
+                      </td>
+                      <td>{log.usuarioId || '—'}</td>
+                      <td className={styles.descripcion}>{log.descripcion}</td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

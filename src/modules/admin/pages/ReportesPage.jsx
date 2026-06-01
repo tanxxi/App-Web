@@ -11,18 +11,32 @@ const estadoColors = {
   CANCELADO:   '#ef4444',
 };
 
+const estadoLabels = {
+  PENDIENTE: 'Pendientes',
+  ASIGNADO: 'Asignados',
+  EN_TRANSITO: 'En Tránsito',
+  ENTREGADO: 'Entregados',
+  CANCELADO: 'Cancelados',
+};
+
 export default function ReportesPage() {
   const { token } = useAuth();
   const [reporte, setReporte] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const cargarReportes = () => {
     if (!token) return;
+    setLoading(true);
+    setError(null);
     getReportes(token)
       .then(setReporte)
       .catch(() => setError('Error al cargar reportes'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    cargarReportes();
   }, [token]);
 
   return (
@@ -33,27 +47,33 @@ export default function ReportesPage() {
       </div>
 
       {loading && <p>Cargando reportes...</p>}
-      {error && <p style={{ color: '#ef4444' }}>{error}</p>}
+
+      {error && (
+        <div className={styles.errorBox}>
+          <span>{error}</span>
+          <button onClick={cargarReportes} className={styles.retryBtn}>Reintentar</button>
+        </div>
+      )}
 
       {reporte && (
         <>
-          <div style={{ marginBottom: '2rem' }}>
-            <div className={styles.reportCard} style={{ maxWidth: 300 }}>
-              <div className={styles.reportIcon} style={{ '--report-color': '#8b5cf6' }}>📦</div>
+          <div className={styles.totalCard}>
+            <div className={styles.reportCard}>
+              <div className={styles.reportIcon}>📦</div>
               <h3 className={styles.reportTitle}>Total de Pedidos</h3>
-              <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#8b5cf6' }}>{reporte.totalPedidos}</p>
+              <p className={styles.reportValue}>{reporte.totalPedidos}</p>
             </div>
           </div>
 
-          <h2 style={{ marginBottom: '1rem' }}>Pedidos por Estado</h2>
+          <h2 className={styles.sectionTitle}>Pedidos por Estado</h2>
           <div className={styles.reportsGrid}>
             {Object.entries(reporte.porEstado ?? {}).map(([estado, cantidad]) => (
               <div key={estado} className={styles.reportCard}>
-                <div className={styles.reportIcon} style={{ '--report-color': estadoColors[estado] ?? '#64748b' }}>
+                <div className={styles.reportIcon} style={{ backgroundColor: `${estadoColors[estado] ?? '#64748b'}20` }}>
                   📊
                 </div>
-                <h3 className={styles.reportTitle}>{estado}</h3>
-                <p style={{ fontSize: '1.8rem', fontWeight: 'bold', color: estadoColors[estado] ?? '#64748b' }}>
+                <h3 className={styles.reportTitle}>{estadoLabels[estado] || estado}</h3>
+                <p className={styles.reportValue} style={{ color: estadoColors[estado] ?? '#64748b' }}>
                   {cantidad}
                 </p>
                 <p className={styles.reportDesc}>

@@ -29,7 +29,7 @@ export default function HistorialPage() {
     setBuscado(true);
     try {
       const data = await getHistorialPedido(filtroPedido.trim(), token);
-      setHistorial(data);
+      setHistorial(data.content || data || []);
     } catch {
       setError('No se encontró historial para ese pedido o no tienes acceso.');
       setHistorial([]);
@@ -70,10 +70,14 @@ export default function HistorialPage() {
         {buscado && <span className={styles.count}>{sortedHistorial.length} eventos</span>}
       </div>
 
-      {error && <p style={{ color: '#ef4444', padding: '1rem' }}>{error}</p>}
+      {error && (
+        <div className={styles.errorBox}>
+          <span>{error}</span>
+        </div>
+      )}
 
       {!buscado && !error && (
-        <p style={{ color: 'var(--text-secondary)', padding: '1rem' }}>
+        <p className={styles.hintText}>
           Ingresa el ID de un pedido para ver su historial.
         </p>
       )}
