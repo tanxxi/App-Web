@@ -1,30 +1,44 @@
 import { useState } from 'react';
-import { historialMock } from '../../../mock/historialMock';
+import { useAuth } from '../../../context/AuthContext';
+import { getHistorialPedido } from '../../../services/adminService';
 import styles from './HistorialPage.module.css';
 
 const tipoColors = {
-  Creación: { bg: '#dbeafe', color: '#1d4ed8', icon: '📝' },
-  Asignación: { bg: '#e0f2fe', color: '#0369a1', icon: '👤' },
-  'Cambio de Estado': { bg: '#fef3c7', color: '#d97706', icon: '🔄' },
-  Entrega: { bg: '#dcfce7', color: '#16a34a', icon: '✅' },
-  Cancelación: { bg: '#fee2e2', color: '#dc2626', icon: '❌' },
+  CREADO:                { bg: '#dbeafe', color: '#1d4ed8', icon: '📝' },
+  ASIGNADO:              { bg: '#e0f2fe', color: '#0369a1', icon: '👤' },
+  ESTADO_CAMBIADO:       { bg: '#fef3c7', color: '#d97706', icon: '🔄' },
+  ENTREGADO:             { bg: '#dcfce7', color: '#16a34a', icon: '✅' },
+  CANCELADO:             { bg: '#fee2e2', color: '#dc2626', icon: '❌' },
+  ACTUALIZADO:           { bg: '#f3e8ff', color: '#7c3aed', icon: '✏️' },
+  UBICACION_ACTUALIZADA: { bg: '#ecfdf5', color: '#059669', icon: '📍' },
 };
 
 export default function HistorialPage() {
-  const [historial] = useState(historialMock);
+  const { token } = useAuth();
+  const [historial, setHistorial] = useState([]);
   const [filtroPedido, setFiltroPedido] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [buscado, setBuscado] = useState(false);
 
-  const handleFiltrar = (e) => {
+  const handleBuscar = async (e) => {
     e.preventDefault();
-    // El filtrado se hace en tiempo real
+    if (!filtroPedido.trim()) return;
+    setLoading(true);
+    setError(null);
+    setBuscado(true);
+    try {
+      const data = await getHistorialPedido(filtroPedido.trim(), token);
+      setHistorial(data);
+    } catch {
+      setError('No se encontró historial para ese pedido o no tienes acceso.');
+      setHistorial([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredHistorial = historial.filter((h) => {
-    if (!filtroPedido) return true;
-    return h.pedidoId.toString().includes(filtroPedido);
-  });
-
-  const sortedHistorial = [...filteredHistorial].sort(
+  const sortedHistorial = [...historial].sort(
     (a, b) => new Date(b.fechaHora) - new Date(a.fechaHora)
   );
 
@@ -33,25 +47,36 @@ export default function HistorialPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Historial de Actividad</h1>
-          <p className={styles.subtitle}>Registro de eventos y auditoria del sistema</p>
+          <p className={styles.subtitle}>Registro de eventos por pedido</p>
         </div>
       </div>
 
       <div className={styles.filters}>
-        <form onSubmit={handleFiltrar} className={styles.filterForm}>
+        <form onSubmit={handleBuscar} className={styles.filterForm}>
           <div className={styles.filterGroup}>
-            <label>Filtrar por ID de Pedido:</label>
+            <label>ID de Pedido:</label>
             <input
               type="text"
-              placeholder="Ej: 103"
+              placeholder="Ej: 5"
               value={filtroPedido}
               onChange={(e) => setFiltroPedido(e.target.value)}
               className={styles.searchInput}
             />
           </div>
+          <button type="submit" className={styles.searchBtn} disabled={loading}>
+            {loading ? 'Buscando...' : 'Buscar'}
+          </button>
         </form>
-        <span className={styles.count}>{sortedHistorial.length} eventos</span>
+        {buscado && <span className={styles.count}>{sortedHistorial.length} eventos</span>}
       </div>
+
+      {error && <p style={{ color: '#ef4444', padding: '1rem' }}>{error}</p>}
+
+      {!buscado && !error && (
+        <p style={{ color: 'var(--text-secondary)', padding: '1rem' }}>
+          Ingresa el ID de un pedido para ver su historial.
+        </p>
+      )}
 
       <div className={styles.timeline}>
         {sortedHistorial.map((evento) => {
@@ -66,18 +91,15 @@ export default function HistorialPage() {
               </div>
               <div className={styles.timelineContent}>
                 <div className={styles.eventHeader}>
-                  <span
-                    className={styles.eventType}
-                    style={{ backgroundColor: config.bg, color: config.color }}
-                  >
+                  <span className={styles.eventType} style={{ backgroundColor: config.bg, color: config.color }}>
                     {evento.tipoEvento}
                   </span>
                   <span className={styles.eventTime}>
                     {new Date(evento.fechaHora).toLocaleString('es-CO')}
                   </span>
                 </div>
-                <p className={styles.eventObs}>{evento.observacion}</p>
-                <span className={styles.eventPedido}>Pedido #{evento.pedidoId}</span>
+                {evento.observacion && <p className={styles.eventObs}>{evento.observacion}</p>}
+                <span className={styles.eventPedido}>Pedido #{evento.pedidoId ?? filtroPedido}</span>
               </div>
             </div>
           );

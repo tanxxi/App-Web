@@ -16,6 +16,7 @@ export default function PedidosPage() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filtroEstado, setFiltroEstado] = useState('todos');
 
   useEffect(() => {
     if (!token) return;
@@ -24,16 +25,15 @@ export default function PedidosPage() {
       .catch(() => setError('Error al cargar pedidos'))
       .finally(() => setLoading(false));
   }, [token]);
-  const [filtroEstado, setFiltroEstado] = useState('todos');
 
-  const estados = ['todos', 'Pendiente', 'Asignado', 'EnTransito', 'Entregado', 'Cancelado'];
+  const estados = ['todos', 'PENDIENTE', 'ASIGNADO', 'EN_TRANSITO', 'ENTREGADO', 'CANCELADO'];
 
   const handleVerDetalle = (id) => {
-    alert(`Ver detalle del pedido #${id} (simulado)`);
+    alert(`Ver detalle del pedido #${id}`);
   };
 
   const handleEditar = (id) => {
-    alert(`Editar pedido #${id} (simulado)`);
+    alert(`Editar pedido #${id}`);
   };
 
   const filteredPedidos = pedidos.filter((p) => {
@@ -63,6 +63,11 @@ export default function PedidosPage() {
         <span className={styles.count}>{filteredPedidos.length} pedidos</span>
       </div>
 
+      {loading ? (
+        <p>Cargando pedidos...</p>
+      ) : error ? (
+        <p style={{ color: '#ef4444' }}>{error}</p>
+      ) : (
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
@@ -83,7 +88,7 @@ export default function PedidosPage() {
               return (
                 <tr key={pedido.id}>
                   <td className={styles.idCell}>#{pedido.id}</td>
-                  <td>{pedido.cliente}</td>
+                  <td>{pedido.clienteNombre || '—'}</td>
                   <td>{pedido.origen}</td>
                   <td>{pedido.destino}</td>
                   <td>
@@ -94,8 +99,8 @@ export default function PedidosPage() {
                       {pedido.estado}
                     </span>
                   </td>
-                  <td>{pedido.repartidor || '—'}</td>
-                  <td>{pedido.fecha}</td>
+                  <td>{pedido.repartidorNombre || '—'}</td>
+                  <td>{pedido.fechaCreacion ? new Date(pedido.fechaCreacion).toLocaleDateString('es-CO') : '—'}</td>
                   <td>
                     <div className={styles.actions}>
                       <button onClick={() => handleVerDetalle(pedido.id)} className={styles.actionBtn} title="Ver detalle">
@@ -112,6 +117,7 @@ export default function PedidosPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }

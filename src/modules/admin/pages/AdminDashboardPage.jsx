@@ -65,20 +65,20 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Actividad Reciente</h2>
+        <h2 className={styles.sectionTitle}>Pedidos Recientes</h2>
         <div className={styles.activityList}>
-          {actividadReciente.map((evento) => (
-            <div key={evento.id} className={styles.activityItem}>
+          {pedidos.slice(0, 5).map((pedido) => (
+            <div key={pedido.id} className={styles.activityItem}>
               <div className={styles.activityDot}></div>
               <div className={styles.activityContent}>
                 <div className={styles.activityHeader}>
-                  <span className={styles.activityType}>{evento.tipoEvento}</span>
+                  <span className={styles.activityType}>{pedido.estado}</span>
                   <span className={styles.activityTime}>
-                    {new Date(evento.fechaHora).toLocaleString('es-CO')}
+                    {pedido.fechaCreacion && new Date(pedido.fechaCreacion).toLocaleString('es-CO')}
                   </span>
                 </div>
-                <p className={styles.activityObs}>{evento.observacion}</p>
-                <span className={styles.activityPedido}>Pedido #{evento.pedidoId}</span>
+                <p className={styles.activityObs}>{pedido.origen} → {pedido.destino}</p>
+                <span className={styles.activityPedido}>Pedido #{pedido.id} — {pedido.clienteNombre || 'Sin cliente'}</span>
               </div>
             </div>
           ))}

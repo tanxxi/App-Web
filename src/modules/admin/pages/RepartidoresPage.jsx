@@ -14,6 +14,8 @@ export default function RepartidoresPage() {
   const [repartidores, setRepartidores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [filtroNombre, setFiltroNombre] = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -22,22 +24,20 @@ export default function RepartidoresPage() {
       .catch(() => setError('Error al cargar repartidores'))
       .finally(() => setLoading(false));
   }, [token]);
-  const [filtroEstado, setFiltroEstado] = useState('todos');
-  const [filtroNombre, setFiltroNombre] = useState('');
 
-  const estados = ['todos', 'Disponible', 'Ocupado', 'Inactivo'];
+  const estados = ['todos', 'DISPONIBLE', 'OCUPADO', 'INACTIVO'];
 
   const handleVerDetalle = (id) => {
-    alert(`Ver detalle del repartidor #${id} (simulado)`);
+    alert(`Ver detalle del repartidor #${id}`);
   };
 
   const handleEditar = (id) => {
-    alert(`Editar repartidor #${id} (simulado)`);
+    alert(`Editar repartidor #${id}`);
   };
 
   const filteredRepartidores = repartidores.filter((r) => {
     const matchEstado = filtroEstado === 'todos' || r.estado === filtroEstado;
-    const matchNombre = r.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
+    const matchNombre = (r.nombre || '').toLowerCase().includes(filtroNombre.toLowerCase());
     return matchEstado && matchNombre;
   });
 
@@ -72,6 +72,11 @@ export default function RepartidoresPage() {
         <span className={styles.count}>{filteredRepartidores.length} repartidores</span>
       </div>
 
+      {loading ? (
+        <p>Cargando repartidores...</p>
+      ) : error ? (
+        <p style={{ color: '#ef4444' }}>{error}</p>
+      ) : (
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
@@ -83,7 +88,6 @@ export default function RepartidoresPage() {
               <th>Vehículo</th>
               <th>Capacidad</th>
               <th>Estado</th>
-              <th>Pedidos Activos</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -93,10 +97,10 @@ export default function RepartidoresPage() {
               return (
                 <tr key={rep.id}>
                   <td className={styles.idCell}>#{rep.id}</td>
-                  <td>{rep.nombre}</td>
+                  <td>{rep.nombre} {rep.apellido || ''}</td>
                   <td>{rep.email}</td>
-                  <td>{rep.telefono}</td>
-                  <td>{rep.vehiculo}</td>
+                  <td>{rep.telefono || '—'}</td>
+                  <td>{rep.vehiculo || '—'}</td>
                   <td>{rep.capacidad}</td>
                   <td>
                     <span
@@ -105,9 +109,6 @@ export default function RepartidoresPage() {
                     >
                       {rep.estado}
                     </span>
-                  </td>
-                  <td>
-                    <span className={styles.pedidosBadge}>{rep.pedidosActivos}</span>
                   </td>
                   <td>
                     <div className={styles.actions}>
@@ -125,6 +126,7 @@ export default function RepartidoresPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }
