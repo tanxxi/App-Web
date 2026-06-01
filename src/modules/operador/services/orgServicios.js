@@ -82,6 +82,90 @@ export const obtenerPedido = async(id, token) =>
   return await response.json();
 }
 
+export const fetchHistorialPedido = async (pedidoId, filtros, token) => {
+
+  const params = new URLSearchParams();
+
+  params.append('page', String(filtros.page ?? 0));
+  params.append('size', String(filtros.limite ?? 10));
+  if (filtros.sort) {
+    params.append('sort', filtros.sort);
+  } else {
+    params.append('sort', 'fechaHora,desc');
+  }
+
+  if (filtros.tipoEvento) params.append('tipoEvento', filtros.tipoEvento);
+  if (filtros.estado && filtros.estado !== 'Todos') params.append('estado', filtros.estado);
+  if (filtros.fechaDesde) params.append('fechaDesde', filtros.fechaDesde);
+  if (filtros.fechaHasta) params.append('fechaHasta', filtros.fechaHasta);
+  if (filtros.observacion) params.append('observacion', filtros.observacion);
+
+  const url = `${API}/api/pedidos/${pedidoId}/historial?${params.toString()}`;
+
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Error al cargar historial');
+  }
+
+  return await response.json(); // { content, totalPages, totalElements, ... }
+};
+
+// Actualización completa del pedido (PUT)
+export const actualizarPedido = async (id, datos, token) => {
+  const response = await fetch(`${API}/api/pedidos/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datos),
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Error al actualizar el pedido');
+  }
+  return await response.json();
+};
+
+// Cambiar solo el estado (PATCH con query param)
+export const cambiarEstadoPedido = async (id, nuevoEstado, token) => {
+  const response = await fetch(`${API}/api/pedidos/${id}/estado?nuevoEstado=${encodeURIComponent(nuevoEstado)}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Error al cambiar el estado');
+  }
+  return await response.json();
+};
+
+// Asignar repartidor (PATCH con query param)
+export const asignarRepartidorPedido = async (id, repartidorId, token) => {
+  const response = await fetch(`${API}/api/pedidos/${id}/asignar?repartidorId=${repartidorId}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Error al asignar repartidor');
+  }
+  return await response.json();
+};
+
 // orgServicios.js (añade esto después de fetchPedidos)
 import { repartidoresMock } from '../../../data/repartidoresMock'; // Asegúrate de la ruta correcta
 
