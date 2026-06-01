@@ -1,15 +1,27 @@
-import { useState } from 'react';
-import { repartidoresMock } from '../../../mock/repartidoresMock';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { getRepartidoresAdmin } from '../../../services/adminService';
 import styles from './RepartidoresPage.module.css';
 
 const estadoColors = {
-  Disponible: { bg: '#dcfce7', color: '#16a34a' },
-  Ocupado: { bg: '#fef3c7', color: '#d97706' },
-  Inactivo: { bg: '#fee2e2', color: '#dc2626' },
+  DISPONIBLE: { bg: '#dcfce7', color: '#16a34a' },
+  OCUPADO: { bg: '#fef3c7', color: '#d97706' },
+  INACTIVO: { bg: '#fee2e2', color: '#dc2626' },
 };
 
 export default function RepartidoresPage() {
-  const [repartidores] = useState(repartidoresMock);
+  const { token } = useAuth();
+  const [repartidores, setRepartidores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!token) return;
+    getRepartidoresAdmin(token)
+      .then(setRepartidores)
+      .catch(() => setError('Error al cargar repartidores'))
+      .finally(() => setLoading(false));
+  }, [token]);
   const [filtroEstado, setFiltroEstado] = useState('todos');
   const [filtroNombre, setFiltroNombre] = useState('');
 

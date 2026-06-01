@@ -1,17 +1,29 @@
-import { useState } from 'react';
-import { pedidosMock } from '../../../mock/pedidosMock';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { getPedidosAdmin } from '../../../services/adminService';
 import styles from './PedidosPage.module.css';
 
 const estadoColors = {
-  Pendiente: { bg: '#fef3c7', color: '#d97706' },
-  Asignado: { bg: '#dbeafe', color: '#1d4ed8' },
-  EnTransito: { bg: '#e0f2fe', color: '#0369a1' },
-  Entregado: { bg: '#dcfce7', color: '#16a34a' },
-  Cancelado: { bg: '#fee2e2', color: '#dc2626' },
+  PENDIENTE: { bg: '#fef3c7', color: '#d97706' },
+  ASIGNADO: { bg: '#dbeafe', color: '#1d4ed8' },
+  EN_TRANSITO: { bg: '#e0f2fe', color: '#0369a1' },
+  ENTREGADO: { bg: '#dcfce7', color: '#16a34a' },
+  CANCELADO: { bg: '#fee2e2', color: '#dc2626' },
 };
 
 export default function PedidosPage() {
-  const [pedidos] = useState(pedidosMock);
+  const { token } = useAuth();
+  const [pedidos, setPedidos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!token) return;
+    getPedidosAdmin(token)
+      .then(data => setPedidos(data.content || []))
+      .catch(() => setError('Error al cargar pedidos'))
+      .finally(() => setLoading(false));
+  }, [token]);
   const [filtroEstado, setFiltroEstado] = useState('todos');
 
   const estados = ['todos', 'Pendiente', 'Asignado', 'EnTransito', 'Entregado', 'Cancelado'];
