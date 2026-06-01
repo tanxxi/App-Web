@@ -2,16 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import { actualizarUbicacion } from '../services/repartidorServices';
 import styles from './TrackingComponent.alt.module.css';
 
-function TrackingComponent({ repartidorId }) {
+function TrackingComponent({ pedidos, token }) {
   const [isTracking, setIsTracking] = useState(false);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const watchIdRef = useRef(null);
 
   useEffect(() => {
-    // Cleanup al desmontar
     return () => stopTracking();
   }, []);
+
+  const pedidosEnTransito = pedidos?.filter(p => p.estado === 'EN_TRANSITO') ?? [];
 
   const startTracking = () => {
     if (!navigator.geolocation) {
@@ -22,18 +23,17 @@ function TrackingComponent({ repartidorId }) {
     setIsTracking(true);
     setError(null);
 
-    // Simulamos que al "Iniciar Ruta" se cambia algún estado general (esto se haría en Dashboard o contexto real)
-    
     watchIdRef.current = navigator.geolocation.watchPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         setLocation({ lat: latitude, lng: longitude });
-        
-        try {
-          // Enviar ubicación al backend
-          await actualizarUbicacion(repartidorId, latitude, longitude, "Ubicación actual en ruta");
-        } catch (err) {
-          console.error("Error enviando ubicación:", err);
+
+        for (const pedido of pedidosEnTransito) {
+          try {
+            await actualizarUbicacion(pedido.id, latitude, longitude, "Ubicación actual en ruta", token);
+          } catch (err) {
+            console.error(`Error enviando ubicación para pedido ${pedido.id}:`, err);
+          }
         }
       },
       (err) => {
@@ -66,7 +66,9 @@ function TrackingComponent({ repartidorId }) {
         <div>
           <h3 className={styles.title}>Transmisión GPS</h3>
           <p className={styles.subtitle}>
-            {isTracking ? 'Enviando coordenadas en tiempo real' : 'Ruta inactiva'}
+            {isTracking
+              ? `Enviando coordenadas — ${pedidosEnTransito.length} pedido(s) en tránsito`
+              : 'Ruta inactiva'}
           </p>
           {location && isTracking && (
             <p className={styles.coords}>
@@ -76,7 +78,7 @@ function TrackingComponent({ repartidorId }) {
           {error && <p className={styles.error}>{error}</p>}
         </div>
       </div>
-      <button 
+      <button
         className={`${styles.actionBtn} ${isTracking ? styles.stop : styles.start}`}
         onClick={isTracking ? stopTracking : startTracking}
       >

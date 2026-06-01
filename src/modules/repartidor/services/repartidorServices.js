@@ -1,33 +1,32 @@
-import { pedidosMock } from '../../../mock/pedidosMock';
+const API_BASE = 'http://localhost:8080';
 
-const delay = (ms) => new Promise(res => setTimeout(res, ms));
-
-export const getPedidosRepartidor = async (repartidorId) => {
-  await delay(800); // simula delay de red
-  return pedidosMock.filter(p => p.repartidorId === repartidorId);
+export const getPedidosRepartidor = async (repartidorId, token) => {
+  const res = await fetch(`${API_BASE}/api/pedidos?repartidorId=${repartidorId}&size=50`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Error al obtener pedidos');
+  const data = await res.json();
+  return data.content ?? data;
 };
 
-export const actualizarEstadoPedido = async (pedidoId, nuevoEstado) => {
-  await delay(600);
-  // Validar flujo de estados lógicamente
-  const pedido = pedidosMock.find(p => p.id === pedidoId);
-  if (!pedido) throw new Error("Pedido no encontrado");
-  
-  // Pendiente -> Asignado -> EnTransito -> Entregado
-  const estados = ['Pendiente', 'Asignado', 'EnTransito', 'Entregado'];
-  const currentIndex = estados.indexOf(pedido.estado);
-  const newIndex = estados.indexOf(nuevoEstado);
-
-  if (newIndex <= currentIndex) {
-      throw new Error("Transición de estado inválida.");
-  }
-  
-  pedido.estado = nuevoEstado;
-  return { success: true, pedido };
+export const actualizarEstadoPedido = async (pedidoId, nuevoEstado, token) => {
+  const res = await fetch(`${API_BASE}/api/pedidos/${pedidoId}/estado?nuevoEstado=${nuevoEstado}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error('Error al actualizar estado del pedido');
+  return await res.json();
 };
 
-export const actualizarUbicacion = async (repartidorId, lat, lng, direccion) => {
-  // Simulamos que enviamos la ubicación
-  console.log(`[Mock API] Ubicación actualizada - Repartidor: ${repartidorId} | Lat: ${lat}, Lng: ${lng} | Dir: ${direccion}`);
+export const actualizarUbicacion = async (pedidoId, lat, lng, direccion, token) => {
+  const res = await fetch(`${API_BASE}/api/pedidos/${pedidoId}/ubicacion`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ latitud: lat, longitud: lng, direccion })
+  });
+  if (!res.ok) throw new Error('Error al actualizar ubicación');
   return { success: true };
 };
