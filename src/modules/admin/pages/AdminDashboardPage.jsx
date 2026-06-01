@@ -1,40 +1,48 @@
 import { useEffect, useState } from 'react';
-import { MOCK_CREDENTIALS } from '../../../mock/credentialsMock';
-import { pedidosMock } from '../../../mock/pedidosMock';
-import { historialMock } from '../../../mock/historialMock';
-import { repartidoresMock } from '../../../mock/repartidoresMock';
+import { useAuth } from '../../../context/AuthContext';
+import { getPedidosAdmin, getUsuariosAdmin } from '../../../services/adminService';
 import styles from './AdminDashboardPage.module.css';
 
 export default function AdminDashboardPage() {
+  const { token } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [pedidos, setPedidos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!token) return;
+    Promise.all([getPedidosAdmin(token), getUsuariosAdmin(token)])
+      .then(([pedidosData, usuariosData]) => {
+        setPedidos(pedidosData.content || []);
+        setUsuarios(usuariosData || []);
+      })
+      .catch(() => setError('Error al cargar datos'))
+      .finally(() => setLoading(false));
+  }, [token]);
 
   if (loading) {
     return <div className={styles.loading}>Cargando dashboard...</div>;
   }
 
-  const totalUsuarios = MOCK_CREDENTIALS.length;
-  const totalPedidos = pedidosMock.length;
-  const pedidosActivos = pedidosMock.filter(p => p.estado === 'EnTransito' || p.estado === 'Asignado').length;
-  const pedidosCancelados = pedidosMock.filter(p => p.estado === 'Cancelado').length;
-  const repartidoresActivos = repartidoresMock.filter(r => r.estado === 'Ocupado').length;
-  const operadoresActivos = MOCK_CREDENTIALS.filter(u => u.rol === 'OperadorLogistico' || u.rol === 'Administrador').length;
+  if (error) {
+    return <div style={{ color: '#ef4444', padding: '1rem' }}>{error}</div>;
+  }
 
-  const actividadReciente = [...historialMock]
-    .sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora))
-    .slice(0, 5);
+  const totalUsuarios = usuarios.length;
+  const totalPedidos = pedidos.length;
+  const pedidosActivos = pedidos.filter(p => p.estado === 'EN_TRANSITO' || p.estado === 'ASIGNADO').length;
+  const pedidosCancelados = pedidos.filter(p => p.estado === 'CANCELADO').length;
+  const pedidosPendientes = pedidos.filter(p => p.estado === 'PENDIENTE').length;
+  const pedidosEntregados = pedidos.filter(p => p.estado === 'ENTREGADO').length;
 
   const kpis = [
     { label: 'Total Usuarios', value: totalUsuarios, icon: '👥', color: '#3b82f6' },
     { label: 'Total Pedidos', value: totalPedidos, icon: '📦', color: '#8b5cf6' },
-    { label: 'Pedidos Activos', value: pedidosActivos, icon: '🚚', color: '#f59e0b' },
-    { label: 'Pedidos Cancelados', value: pedidosCancelados, icon: '❌', color: '#ef4444' },
-    { label: 'Repartidores Activos', value: repartidoresActivos, icon: '🏍️', color: '#10b981' },
-    { label: 'Operadores Activos', value: operadoresActivos, icon: '👨‍💼', color: '#06b6d4' },
+    { label: 'Pendientes', value: pedidosPendientes, icon: '⏳', color: '#f59e0b' },
+    { label: 'Activos', value: pedidosActivos, icon: '🚚', color: '#06b6d4' },
+    { label: 'Entregados', value: pedidosEntregados, icon: '✅', color: '#10b981' },
+    { label: 'Cancelados', value: pedidosCancelados, icon: '❌', color: '#ef4444' },
   ];
 
   return (
